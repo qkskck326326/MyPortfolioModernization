@@ -1,0 +1,20 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: MyPortfolio
+  datasource:
+    url: jdbc:mysql://localhost:3306/myportfolio?useSSL=false&serverTimezone=Asia/Seoul
+    username: mysql3306
+    password: pass3306
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+      format_sql: true
+jwt:
+  secret: "your-jwt-secret-key"
+  expiration-time: 3600000
