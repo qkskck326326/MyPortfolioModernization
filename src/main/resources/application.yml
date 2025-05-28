@@ -5,7 +5,7 @@ spring:
   application:
     name: MyPortfolio
   datasource:
-    url: jdbc:mysql://localhost:3306/myportfolio?useSSL=false&serverTimezone=Asia/Seoul
+    url: jdbc:mysql://localhost:3306/myportfolio?useSSL=false&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
     username: myuser
     password: myuser3306
   jpa:
@@ -18,5 +18,6 @@ spring:
 
 jwt:
   secret: "33810272d7a8258c39da67cb6ddb4813a286efb563d166f9753739efcf0f5a4c353beca1184a17384b3d9408c82bdfc9e619ab7dbf25295a3959aa893dee2b8dfb18b56df8f476bfe1f8c21c57a9c74375bb4a0f276edd4665f2bfbe30e2fe7ea64789f3d3d9cef10ad766165e3415ae7142493b75ad41223b5edf66cc36751481e3abda789c356adc60c2d3c32f38eac918d3e61bcafb2b45ae82515f733edf0271ee7d296fc49c3bfbda264441cd6e7698ea3ece80cbdfc5122262cb5be7c6b3b469b06bf249eda3d43593cb3d20bedbca78a20adb38483e4090331277369583619b3a8252d4647c57e61383e9877b24be0e378e627869b9ba8024054b4d78"
-  access-expiration: 3600000         # 1??
-  refresh-expiration: 1209600000     # 2?
+  access-expiration: 3600000         # 1시간
+  refresh-expiration: 1209600000     #
+  reissue-threshold: 86400000  # 1일
