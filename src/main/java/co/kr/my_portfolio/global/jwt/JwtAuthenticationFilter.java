@@ -27,7 +27,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = resolveToken(request);
 
         if (token != null && jwtProvider.validateToken(token)) {
-            String userId = jwtProvider.getUserIdFromToken(token);
+            String userId = jwtProvider.getUserId(token);
 
             // 인증 객체 생성 - 현재는 권한 없이 인증만 /////////////////////
             UsernamePasswordAuthenticationToken authentication =
