@@ -1,5 +1,6 @@
-package co.kr.my_portfolio.auth.dto;
+package co.kr.my_portfolio.user.dto;
 
+import co.kr.my_portfolio.auth.dto.login.LoginRequest;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -13,7 +14,7 @@ public class UserSignupRequest implements LoginRequest {
     private String email;
 
     @NotBlank(message = "비밀번호는 필수입니다.")
-    @Size(min = 6, message = "비밀번호는 최소 6자 이상이어야 합니다.")
+    @Size(min = 8, message = "비밀번호는 최소 8자 이상이어야 합니다.")
     private String password;
 
     @NotBlank(message = "닉네임은 필수입니다.")
