@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // ✅ Validation 에러 처리
+    // Validation 에러 처리
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse<String>> handleValidationException(MethodArgumentNotValidException ex) {
         BindingResult bindingResult = ex.getBindingResult();
@@ -22,7 +22,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(ApiResponse.fail(errorMessage));
     }
 
-    // ✅ 일반적인 예외 처리 (예: 이메일 중복 등)
+    // 일반적인 예외 처리 ///////////////////
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ApiResponse<String>> handleIllegalArgumentException(IllegalArgumentException ex) {
         return ResponseEntity.badRequest().body(ApiResponse.fail(ex.getMessage()));

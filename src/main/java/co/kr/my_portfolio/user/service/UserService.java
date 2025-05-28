@@ -1,12 +1,9 @@
 package co.kr.my_portfolio.user.service;
 
-import co.kr.my_portfolio.auth.dto.TokenResponse;
 import co.kr.my_portfolio.auth.service.LoginService;
-import co.kr.my_portfolio.global.jwt.JwtProvider;
 import co.kr.my_portfolio.user.domain.Role;
 import co.kr.my_portfolio.user.domain.User;
-import co.kr.my_portfolio.auth.dto.EmailLoginRequest;
-import co.kr.my_portfolio.auth.dto.UserSignupRequest;
+import co.kr.my_portfolio.user.dto.UserSignupRequest;
 import co.kr.my_portfolio.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;

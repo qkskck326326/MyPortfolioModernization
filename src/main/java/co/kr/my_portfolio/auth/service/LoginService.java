@@ -1,9 +1,9 @@
 package co.kr.my_portfolio.auth.service;
 
-import co.kr.my_portfolio.auth.dto.LoginRequest;
+import co.kr.my_portfolio.auth.dto.login.LoginRequest;
 import co.kr.my_portfolio.auth.strategy.LoginStrategy;
 import co.kr.my_portfolio.user.domain.User;
-import co.kr.my_portfolio.auth.dto.TokenResponse;
+import co.kr.my_portfolio.auth.dto.jwt.TokenResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +15,8 @@ public class LoginService {
 
     private final List<LoginStrategy> loginStrategies;
     private final TokenService tokenService;
-
+    
+    // 로그인
     public TokenResponse login(LoginRequest request) {
         LoginStrategy strategy = loginStrategies.stream()
                 .filter(s -> s.supports(request))
@@ -24,5 +25,16 @@ public class LoginService {
 
         User user = strategy.authenticate(request);
         return tokenService.generateTokens(user);
+    }
+    
+    // 로그아웃
+    public void logout(String refreshToken) {
+        tokenService.invalidateRefreshToken(refreshToken);
+
+    }
+    
+    // 토큰 재생성
+    public TokenResponse reissue(String refreshToken) {
+        return tokenService.reissueTokens(refreshToken);
     }
 }

@@ -1,4 +1,4 @@
-package co.kr.my_portfolio.auth.dto;
+package co.kr.my_portfolio.auth.dto.jwt;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

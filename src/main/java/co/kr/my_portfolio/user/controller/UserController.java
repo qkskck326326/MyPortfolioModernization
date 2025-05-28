@@ -1,7 +1,7 @@
 package co.kr.my_portfolio.user.controller;
 
 import co.kr.my_portfolio.common.dto.ApiResponse;
-import co.kr.my_portfolio.auth.dto.UserSignupRequest;
+import co.kr.my_portfolio.user.dto.UserSignupRequest;
 import co.kr.my_portfolio.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
