@@ -67,4 +67,25 @@ public class JwtProvider {
                 .getBody()
                 .getSubject();
     }
+
+    public Role getRole(String token) {
+        String roleName = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .get("role", String.class);
+        return Role.valueOf(roleName);
+    }
+
+    public long getExpiration(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getExpiration()
+                .getTime();
+    }
+
 }
