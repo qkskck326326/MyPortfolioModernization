@@ -1,4 +1,4 @@
-package co.kr.my_portfolio.global.config;
+package co.kr.my_portfolio.global.security.config;
 
 import co.kr.my_portfolio.global.jwt.JwtAuthenticationFilter;
 import co.kr.my_portfolio.global.jwt.JwtProvider;
