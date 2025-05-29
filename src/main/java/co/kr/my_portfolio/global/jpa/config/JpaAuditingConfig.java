@@ -1,4 +1,4 @@
-package co.kr.my_portfolio.global.config;
+package co.kr.my_portfolio.global.jpa.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
