@@ -26,12 +26,12 @@ public class TokenService {
 
         String accessToken = jwtProvider.createAccessToken(userId, role);
         String refreshToken = jwtProvider.createRefreshToken(userId, role);
-        long expiration = jwtProvider.getExpiration(refreshToken);
+        Date expiration = jwtProvider.getExpiration(refreshToken);
 
         RefreshToken tokenEntity = RefreshToken.builder()
                 .userId(userId)
                 .token(refreshToken)
-                .expiration(expiration)
+                .expiration(expiration.getTime())
                 .build();
 
         refreshTokenRepository.save(tokenEntity);
@@ -78,13 +78,13 @@ public class TokenService {
         String newAccessToken = jwtProvider.createAccessToken(userId, role);
 
         if (savedToken.needsReissue(jwtProperties.getReissueThreshold())) {
-            String reissuedRefreshToken = jwtProvider.createRefreshToken(userId, role);
-            Long expiration = jwtProvider.getExpiration(reissuedRefreshToken);
+            String newRefreshToken = jwtProvider.createRefreshToken(userId, role);
+            Date expiration = jwtProvider.getExpiration(newRefreshToken);
 
-            savedToken.updateToken(reissuedRefreshToken, expiration);
+            savedToken.updateToken(newRefreshToken, expiration.getTime());
             refreshTokenRepository.save(savedToken);
 
-            return TokenResponse.of(newAccessToken, reissuedRefreshToken);
+            return TokenResponse.of(newAccessToken, newRefreshToken);
         }
 
         return TokenResponse.of(newAccessToken, null);

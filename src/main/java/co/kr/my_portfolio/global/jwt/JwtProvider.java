@@ -78,14 +78,13 @@ public class JwtProvider {
         return Role.valueOf(roleName);
     }
 
-    public long getExpiration(String token) {
+    public Date getExpiration(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
                 .getBody()
-                .getExpiration()
-                .getTime();
+                .getExpiration();
     }
 
 }
