@@ -2,14 +2,19 @@ package co.kr.my_portfolio.auth.service;
 
 import co.kr.my_portfolio.auth.domain.RefreshToken;
 import co.kr.my_portfolio.auth.repository.RefreshTokenRepository;
+import co.kr.my_portfolio.global.jwt.JwtAuthenticationToken;
 import co.kr.my_portfolio.global.jwt.JwtProperties;
 import co.kr.my_portfolio.global.jwt.JwtProvider;
 import co.kr.my_portfolio.user.domain.Role;
 import co.kr.my_portfolio.user.domain.User;
 import co.kr.my_portfolio.auth.dto.jwt.TokenResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
@@ -42,10 +47,6 @@ public class TokenService {
     // 로그아웃
     @Transactional
     public void invalidateRefreshToken(String refreshToken) {
-        if (!jwtProvider.validateToken(refreshToken)) {
-            throw new IllegalArgumentException("유효하지 않은 리프레시 토큰입니다.");
-        }
-
         String userId = jwtProvider.getUserId(refreshToken);
         RefreshToken savedToken = refreshTokenRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("이미 로그아웃된 사용자입니다."));
@@ -58,16 +59,20 @@ public class TokenService {
     }
     
     // 토큰 재생성
+    @Transactional
     public TokenResponse reissueTokens(String refreshToken) {
-        if (!jwtProvider.validateToken(refreshToken)) {
-            throw new IllegalArgumentException("유효하지 않은 리프레시 토큰입니다.");
+        // 인증 객체에서 정보 꺼내기
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (!(authentication instanceof JwtAuthenticationToken)) {
+            throw new IllegalStateException("인증 정보가 없습니다.");
         }
 
-        // 유저 ID
-        String userId = jwtProvider.getUserId(refreshToken);
-        // Role
-        Role role = jwtProvider.getRole(refreshToken);
+        JwtAuthenticationToken auth = (JwtAuthenticationToken) authentication;
+        String userId = auth.getUserId();
+        Role role = Role.valueOf(auth.getRole()); // 필요 시 enum 변환
 
+        // DB에 저장된 리프레시 토큰 비교
         RefreshToken savedToken = refreshTokenRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("저장된 리프레시 토큰이 없습니다."));
 
@@ -75,8 +80,10 @@ public class TokenService {
             throw new IllegalArgumentException("토큰 불일치. 탈취 가능성 있음.");
         }
 
+        // AccessToken 재발급
         String newAccessToken = jwtProvider.createAccessToken(userId, role);
 
+        // RefreshToken 재발급 필요 시
         if (savedToken.needsReissue(jwtProperties.getReissueThreshold())) {
             String newRefreshToken = jwtProvider.createRefreshToken(userId, role);
             Date expiration = jwtProvider.getExpiration(newRefreshToken);
