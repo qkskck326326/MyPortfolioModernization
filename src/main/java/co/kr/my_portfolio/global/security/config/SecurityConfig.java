@@ -2,6 +2,7 @@ package co.kr.my_portfolio.global.security.config;
 
 import co.kr.my_portfolio.global.jwt.JwtAuthenticationFilter;
 import co.kr.my_portfolio.global.jwt.JwtProvider;
+import co.kr.my_portfolio.global.security.handler.CustomAccessDeniedHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,6 +25,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtProvider jwtProvider;
+    private final CustomAccessDeniedHandler accessDeniedHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -36,6 +38,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/users/signup", "/api/login/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/public/**").permitAll()
                         .anyRequest().authenticated()
+                )
+                .exceptionHandling(ex -> ex
+                        .accessDeniedHandler(accessDeniedHandler)
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtProvider),
                         UsernamePasswordAuthenticationFilter.class)
