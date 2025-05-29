@@ -6,6 +6,7 @@ import co.kr.my_portfolio.auth.dto.jwt.TokenResponse;
 import co.kr.my_portfolio.auth.dto.login.LogoutRequest;
 import co.kr.my_portfolio.auth.service.LoginService;
 import co.kr.my_portfolio.common.dto.ApiResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -29,19 +30,30 @@ public class AuthController {
         TokenResponse tokens = loginService.login(request);
         return ResponseEntity.ok(ApiResponse.success(tokens));
     }
-    
+
     // 로그아웃
     @PostMapping("/logout")
-    public ResponseEntity<ApiResponse<Void>> logout(@RequestBody @Valid LogoutRequest request) {
-        loginService.logout(request.getRefreshToken());
+    public ResponseEntity<ApiResponse<Void>> logout(HttpServletRequest request) {
+        String refreshToken = extractTokenFromHeader(request);
+        loginService.logout(refreshToken);
         return ResponseEntity.ok(ApiResponse.success(null, "로그아웃 되었습니다."));
     }
-    
+
     // 토큰 재생성
     @PostMapping("/reissue")
-    public ResponseEntity<ApiResponse<TokenResponse>> reissue(@RequestBody @Valid ReissueRequest request) {
-        TokenResponse tokenResponse = loginService.reissue(request.getRefreshToken());
+    public ResponseEntity<ApiResponse<TokenResponse>> reissue(HttpServletRequest request) {
+        String refreshToken = extractTokenFromHeader(request);
+        TokenResponse tokenResponse = loginService.reissue(refreshToken);
         return ResponseEntity.ok(ApiResponse.success(tokenResponse));
+    }
+
+    // Header에서 Bearer 토큰 꺼내는 공통 메서드
+    private String extractTokenFromHeader(HttpServletRequest request) {
+        String bearer = request.getHeader("Authorization");
+        if (bearer != null && bearer.startsWith("Bearer ")) {
+            return bearer.substring(7);
+        }
+        throw new IllegalArgumentException("Authorization 헤더가 없거나 형식이 잘못되었습니다.");
     }
 
 
