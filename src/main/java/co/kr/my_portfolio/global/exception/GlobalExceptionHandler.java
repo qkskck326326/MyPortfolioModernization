@@ -1,6 +1,8 @@
 package co.kr.my_portfolio.global.exception;
 
 import co.kr.my_portfolio.common.dto.ApiResponse;
+import co.kr.my_portfolio.global.exception.customException.UserNotFoundException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -20,6 +22,22 @@ public class GlobalExceptionHandler {
                 .orElse("잘못된 요청입니다.");
 
         return ResponseEntity.badRequest().body(ApiResponse.fail(errorMessage));
+    }
+    
+    // 조회되지 않는 사용자 에러처리
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ApiResponse<?>> handleUserNotFound(UserNotFoundException ex) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(ApiResponse.fail(ex.getMessage()));
+    }
+    
+    // 인증되지 않은 사용자 에러처리
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ApiResponse<?>> handleIllegalState(IllegalStateException ex) {
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(ApiResponse.fail(ex.getMessage()));
     }
 
     // 일반적인 예외 처리 ///////////////////
