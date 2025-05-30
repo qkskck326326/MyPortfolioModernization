@@ -34,7 +34,7 @@ public class TokenService {
         Date expiration = jwtProvider.getExpiration(refreshToken);
 
         RefreshToken tokenEntity = RefreshToken.builder()
-                .userId(userId)
+                .userId(Long.valueOf(userId))
                 .token(refreshToken)
                 .expiration(expiration.getTime())
                 .build();

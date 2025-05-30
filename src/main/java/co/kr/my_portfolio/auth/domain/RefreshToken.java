@@ -12,7 +12,7 @@ import lombok.*;
 public class RefreshToken {
 
     @Id
-    private String userId;
+    private Long userId;
 
     private String token;
 
