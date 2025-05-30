@@ -17,6 +17,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final LoginService loginService;
 
+    // 회원가입
     public void signup(UserSignupRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
@@ -27,6 +28,10 @@ public class UserService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .nickname(request.getNickname())
                 .role(Role.USER)
+                .userThumbnail(request.getUserThumbnail())
+                .introduce(request.getIntroduce())
+                .github(request.getGithub())
+                .birth(request.getBirth())
                 .build();
 
         userRepository.save(user);
