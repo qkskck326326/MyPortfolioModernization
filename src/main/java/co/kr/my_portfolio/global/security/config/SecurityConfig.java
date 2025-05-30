@@ -3,6 +3,7 @@ package co.kr.my_portfolio.global.security.config;
 import co.kr.my_portfolio.global.jwt.JwtAuthenticationFilter;
 import co.kr.my_portfolio.global.jwt.JwtProvider;
 import co.kr.my_portfolio.global.security.handler.CustomAccessDeniedHandler;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,6 +26,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtProvider jwtProvider;
+    private final ObjectMapper objectMapper;
     private final CustomAccessDeniedHandler accessDeniedHandler;
 
     @Bean
@@ -42,7 +44,7 @@ public class SecurityConfig {
                 .exceptionHandling(ex -> ex
                         .accessDeniedHandler(accessDeniedHandler)
                 )
-                .addFilterBefore(new JwtAuthenticationFilter(jwtProvider),
+                .addFilterBefore(new JwtAuthenticationFilter(jwtProvider, objectMapper),
                         UsernamePasswordAuthenticationFilter.class)
                 .build();
     }

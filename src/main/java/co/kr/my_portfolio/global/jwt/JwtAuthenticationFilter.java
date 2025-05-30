@@ -1,5 +1,7 @@
 package co.kr.my_portfolio.global.jwt;
 
+import co.kr.my_portfolio.common.dto.ApiResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,6 +23,7 @@ import java.util.List;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
+    private final ObjectMapper objectMapper;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -30,7 +33,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String token = resolveToken(request);
 
-        if (token != null && jwtProvider.validateToken(token)) {
+        if (token != null) {
+            if (!jwtProvider.validateToken(token)) {
+                sendUnauthorizedResponse(response, "토큰이 유효하지 않습니다.");
+                return;
+            }
+
             String userId = jwtProvider.getUserId(token);
             String role = jwtProvider.getRole(token).toAuthority();
             Date expiration = jwtProvider.getExpiration(token);
@@ -60,5 +68,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return bearer.substring(7);
         }
         return null;
+    }
+
+    private void sendUnauthorizedResponse(HttpServletResponse response, String message) throws IOException {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("application/json");
+
+        ApiResponse<Void> apiResponse = ApiResponse.fail(message);
+        objectMapper.writeValue(response.getWriter(), apiResponse);
+        response.getWriter().flush();
     }
 }
