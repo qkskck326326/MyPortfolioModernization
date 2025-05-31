@@ -1,5 +1,7 @@
 package co.kr.my_portfolio.user.service;
 
+import co.kr.my_portfolio.auth.principal.AuthenticatedUser;
+import co.kr.my_portfolio.auth.principal.AuthenticatedUserProvider;
 import co.kr.my_portfolio.auth.repository.RefreshTokenRepository;
 import co.kr.my_portfolio.auth.service.LoginService;
 import co.kr.my_portfolio.global.exception.customException.UserNotFoundException;
@@ -12,6 +14,7 @@ import co.kr.my_portfolio.user.dto.UserProfileUpdateRequest;
 import co.kr.my_portfolio.user.dto.UserSignupRequest;
 import co.kr.my_portfolio.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,6 +27,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final AuthenticatedUserProvider authenticatedUserProvider;
 
     // 회원가입
     public void signup(UserSignupRequest request) {
@@ -47,30 +51,20 @@ public class UserService {
     
     // 유저 프로필 반환
     public UserProfileResponse getMyInfo() {
-        JwtAuthenticationToken authentication =
-                (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        AuthenticatedUser authenticatedUser = authenticatedUserProvider.getAuthenticatedUser();
 
-        if (authentication == null || !authentication.isAuthenticated()) {
-            throw new IllegalStateException("인증되지 않은 사용자입니다.");
-        }
+        Long userId = authenticatedUser.getId();
 
-        String userId = (String) authentication.getPrincipal();
-
-        User user = userRepository.findById(Long.parseLong(userId))
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("해당 사용자가 존재하지 않습니다."));
         return UserProfileResponse.from(user);
     }
 
     @Transactional
     public UserProfileResponse updateMyProfile(UserProfileUpdateRequest request) {
-        JwtAuthenticationToken authentication =
-                (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        AuthenticatedUser authenticatedUser = authenticatedUserProvider.getAuthenticatedUser();
 
-        if (authentication == null || !authentication.isAuthenticated()) {
-            throw new IllegalStateException("인증되지 않은 사용자입니다.");
-        }
-
-        Long userId = Long.parseLong((String) authentication.getPrincipal());
+        Long userId = authenticatedUser.getId();
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("해당 사용자가 존재하지 않습니다."));
@@ -88,14 +82,9 @@ public class UserService {
 
     @Transactional
     public void changePassword(PasswordChangeRequest request) {
-        JwtAuthenticationToken authentication =
-                (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        AuthenticatedUser authenticatedUser = authenticatedUserProvider.getAuthenticatedUser();
 
-        if (authentication == null || !authentication.isAuthenticated()) {
-            throw new IllegalStateException("인증되지 않은 사용자입니다.");
-        }
-
-        Long userId = Long.parseLong((String) authentication.getPrincipal());
+        Long userId = authenticatedUser.getId();
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("해당 사용자가 존재하지 않습니다."));
