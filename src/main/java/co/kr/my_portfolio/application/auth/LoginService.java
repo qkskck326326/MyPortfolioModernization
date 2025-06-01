@@ -1,7 +1,7 @@
 package co.kr.my_portfolio.application.auth;
 
 import co.kr.my_portfolio.presentation.auth.dto.login.LoginRequest;
-import co.kr.my_portfolio.domain.auth.strategy.LoginStrategy;
+import co.kr.my_portfolio.application.auth.strategy.LoginStrategy;
 import co.kr.my_portfolio.domain.user.User;
 import co.kr.my_portfolio.presentation.auth.dto.jwt.TokenResponse;
 import lombok.RequiredArgsConstructor;

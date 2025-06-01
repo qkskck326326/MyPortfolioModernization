@@ -1,4 +1,4 @@
-package co.kr.my_portfolio.domain.auth.strategy;
+package co.kr.my_portfolio.application.auth.strategy;
 
 import co.kr.my_portfolio.presentation.auth.dto.login.EmailLoginRequest;
 import co.kr.my_portfolio.presentation.auth.dto.login.LoginRequest;
