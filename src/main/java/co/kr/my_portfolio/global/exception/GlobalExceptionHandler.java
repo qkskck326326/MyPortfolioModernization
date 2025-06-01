@@ -1,7 +1,7 @@
 package co.kr.my_portfolio.global.exception;
 
-import co.kr.my_portfolio.common.dto.ApiResponse;
-import co.kr.my_portfolio.global.exception.customException.UserNotFoundException;
+import co.kr.my_portfolio.global.exception.custom.UserNotFoundException;
+import co.kr.my_portfolio.global.response.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
