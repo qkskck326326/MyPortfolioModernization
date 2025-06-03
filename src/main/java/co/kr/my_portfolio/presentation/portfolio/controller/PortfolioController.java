@@ -1,9 +1,9 @@
 package co.kr.my_portfolio.presentation.portfolio.controller;
 
 import co.kr.my_portfolio.application.portfolio.PortfolioService;
-import co.kr.my_portfolio.domain.portfolio.Portfolio;
 import co.kr.my_portfolio.domain.portfolio.PortfolioCard;
 import co.kr.my_portfolio.global.response.ApiResponse;
+import co.kr.my_portfolio.presentation.portfolio.dto.PortfolioDetailResponse;
 import co.kr.my_portfolio.presentation.portfolio.dto.PortfolioSaveRequest;
 import co.kr.my_portfolio.presentation.portfolio.dto.search.PortfolioSearchRequest;
 import co.kr.my_portfolio.presentation.portfolio.dto.PortfolioUpdateRequest;
@@ -49,9 +49,9 @@ public class PortfolioController {
 
     // 포트폴리오 상세
     @GetMapping("/{portfolioId}")
-    public ResponseEntity<ApiResponse<Portfolio>> getPortfolio(@PathVariable long portfolioId) {
-        Portfolio portfolio = portfolioService.getPortfolio(portfolioId);
-        return ResponseEntity.ok(ApiResponse.success(portfolio, "포트폴리오를 성공적으로 불러왔습니다."));
+    public ResponseEntity<ApiResponse<PortfolioDetailResponse>> getPortfolio(@PathVariable long portfolioId) {
+        PortfolioDetailResponse portfolioDetail = portfolioService.getPortfolio(portfolioId);
+        return ResponseEntity.ok(ApiResponse.success(portfolioDetail, "포트폴리오를 성공적으로 불러왔습니다."));
     }
 
 }

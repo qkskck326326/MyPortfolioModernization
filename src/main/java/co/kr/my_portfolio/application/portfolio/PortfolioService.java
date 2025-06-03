@@ -6,8 +6,12 @@ import co.kr.my_portfolio.domain.portfolio.queryRepository.PortfolioQueryReposit
 import co.kr.my_portfolio.domain.portfolio.repository.PortfolioRepository;
 import co.kr.my_portfolio.domain.tag.Tag;
 import co.kr.my_portfolio.domain.tag.repository.TagRepository;
+import co.kr.my_portfolio.domain.user.User;
+import co.kr.my_portfolio.domain.user.UserRepository;
 import co.kr.my_portfolio.global.exception.custom.PortfolioNotFoundException;
+import co.kr.my_portfolio.global.exception.custom.UserNotFoundException;
 import co.kr.my_portfolio.infrastructure.security.AuthenticatedUserProvider;
+import co.kr.my_portfolio.presentation.portfolio.dto.PortfolioDetailResponse;
 import co.kr.my_portfolio.presentation.portfolio.dto.PortfolioSaveRequest;
 import co.kr.my_portfolio.presentation.portfolio.dto.PortfolioUpdateRequest;
 import co.kr.my_portfolio.presentation.portfolio.dto.search.PortfolioSearchRequest;
@@ -107,8 +111,10 @@ public class PortfolioService {
 
     // 포트폴리오 상세
     @Transactional
-    public Portfolio getPortfolio(Long portfolioId) {
-        return portfolioRepository.findById(portfolioId)
+    public PortfolioDetailResponse getPortfolio(Long portfolioId) {
+        Portfolio portfolio = portfolioRepository.findById(portfolioId)
                 .orElseThrow(() -> new PortfolioNotFoundException("해당 포트폴리오가 존재하지 않습니다."));
+
+        return PortfolioDetailResponse.of(portfolio);
     }
 }
