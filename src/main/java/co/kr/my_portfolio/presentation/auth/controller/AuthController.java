@@ -1,9 +1,10 @@
 package co.kr.my_portfolio.presentation.auth.controller;
 
-import co.kr.my_portfolio.presentation.auth.dto.login.EmailLoginRequest;
+import co.kr.my_portfolio.application.auth.dto.EmailLoginCommand;
 import co.kr.my_portfolio.presentation.auth.dto.jwt.TokenResponse;
 import co.kr.my_portfolio.application.auth.LoginService;
 import co.kr.my_portfolio.global.response.ApiResponse;
+import co.kr.my_portfolio.presentation.auth.dto.login.EmailLoginRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,7 @@ public class AuthController {
     public ResponseEntity<ApiResponse<TokenResponse>> loginWithEmail(
             @Valid @RequestBody EmailLoginRequest request) {
 
-        TokenResponse tokens = loginService.login(request);
+        TokenResponse tokens = loginService.login(request.toCommand());
         return ResponseEntity.ok(ApiResponse.success(tokens));
     }
 

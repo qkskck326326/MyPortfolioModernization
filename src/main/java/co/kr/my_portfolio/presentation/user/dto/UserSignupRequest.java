@@ -1,6 +1,5 @@
 package co.kr.my_portfolio.presentation.user.dto;
 
-import co.kr.my_portfolio.presentation.auth.dto.login.LoginRequest;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -11,7 +10,7 @@ import lombok.Getter;
 import java.time.LocalDate;
 
 @Getter
-public class UserSignupRequest implements LoginRequest {
+public class UserSignupRequest{
 
     @Email(message = "유효한 이메일 형식을 입력해주세요.")
     @NotBlank(message = "이메일은 필수입니다.")

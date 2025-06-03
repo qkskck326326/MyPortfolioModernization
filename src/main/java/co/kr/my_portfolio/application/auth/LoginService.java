@@ -1,6 +1,6 @@
 package co.kr.my_portfolio.application.auth;
 
-import co.kr.my_portfolio.presentation.auth.dto.login.LoginRequest;
+import co.kr.my_portfolio.application.auth.dto.LoginCommand;
 import co.kr.my_portfolio.application.auth.strategy.LoginStrategy;
 import co.kr.my_portfolio.domain.user.User;
 import co.kr.my_portfolio.presentation.auth.dto.jwt.TokenResponse;
@@ -17,7 +17,7 @@ public class LoginService {
     private final TokenService tokenService;
     
     // 로그인
-    public TokenResponse login(LoginRequest request) {
+    public TokenResponse login(LoginCommand request) {
         LoginStrategy strategy = loginStrategies.stream()
                 .filter(s -> s.supports(request))
                 .findFirst()

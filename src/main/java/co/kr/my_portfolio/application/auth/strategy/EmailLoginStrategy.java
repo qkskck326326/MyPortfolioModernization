@@ -1,7 +1,7 @@
 package co.kr.my_portfolio.application.auth.strategy;
 
-import co.kr.my_portfolio.presentation.auth.dto.login.EmailLoginRequest;
-import co.kr.my_portfolio.presentation.auth.dto.login.LoginRequest;
+import co.kr.my_portfolio.application.auth.dto.EmailLoginCommand;
+import co.kr.my_portfolio.application.auth.dto.LoginCommand;
 import co.kr.my_portfolio.domain.user.User;
 import co.kr.my_portfolio.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,13 +16,13 @@ public class EmailLoginStrategy implements LoginStrategy {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public boolean supports(LoginRequest request) {
-        return request instanceof EmailLoginRequest;
+    public boolean supports(LoginCommand request) {
+        return request instanceof EmailLoginCommand;
     }
 
     @Override
-    public User authenticate(LoginRequest request) {
-        EmailLoginRequest emailRequest = (EmailLoginRequest) request;
+    public User authenticate(LoginCommand request) {
+        EmailLoginCommand emailRequest = (EmailLoginCommand) request;
 
         User user = userRepository.findByEmail(emailRequest.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 이메일입니다."));
