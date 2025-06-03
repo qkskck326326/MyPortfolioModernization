@@ -46,4 +46,12 @@ public class PortfolioController {
         Page<PortfolioCard> portfolioCards = portfolioService.getPortfolioCards(request);
         return ResponseEntity.ok(ApiResponse.success(portfolioCards, "불러오기 성공"));
     }
+
+    // 포트폴리오 상세
+    @GetMapping("/{portfolioId}")
+    public ResponseEntity<ApiResponse<Portfolio>> getPortfolio(@PathVariable long portfolioId) {
+        Portfolio portfolio = portfolioService.getPortfolio(portfolioId);
+        return ResponseEntity.ok(ApiResponse.success(portfolio, "포트폴리오를 성공적으로 불러왔습니다."));
+    }
+
 }
