@@ -1,11 +1,17 @@
 package co.kr.my_portfolio.presentation.portfolio.controller;
 
 import co.kr.my_portfolio.application.portfolio.PortfolioService;
+import co.kr.my_portfolio.domain.portfolio.PortfolioCard;
 import co.kr.my_portfolio.global.response.ApiResponse;
 import co.kr.my_portfolio.presentation.portfolio.dto.PortfolioSaveRequest;
+import co.kr.my_portfolio.presentation.portfolio.dto.search.PortfolioSearchRequest;
 import co.kr.my_portfolio.presentation.portfolio.dto.PortfolioUpdateRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,16 +20,36 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class PortfolioController {
     private final PortfolioService portfolioService;
-
+    
+    // 포트폴리오 등록
     @PostMapping
     public ResponseEntity<ApiResponse<String>> savePortfolio(@RequestBody @Valid PortfolioSaveRequest request) {
         portfolioService.savePortfolio(request);
         return ResponseEntity.ok(ApiResponse.success(null, "포트폴리오가 성공적으로 등록되었습니다."));
     }
     
+    // 포트폴리오 수정
     @PutMapping
     public ResponseEntity<ApiResponse<String>> updatePortfolio(@RequestBody @Valid PortfolioUpdateRequest request) {
         portfolioService.updatePortfolioAndTags(request);
         return ResponseEntity.ok(ApiResponse.success(null, "포트폴리오가 성공적으로 수정되었습니다."));
+    }
+
+    // 포트폴리오 보기
+    @PostMapping("/get")
+    public ResponseEntity<ApiResponse<Page<PortfolioCard>>> getPortfolio(@RequestBody PortfolioSearchRequest request) {
+        Pageable pageable = PageRequest.of(
+                request.page(),
+                request.size(),
+                Sort.by(request.sort().stream()
+                        .map(s -> s.direction().equalsIgnoreCase("DESC")
+                                ? Sort.Order.desc(s.property())
+                                : Sort.Order.asc(s.property()))
+                        .toList())
+        );
+
+        Page<PortfolioCard> portfolioCards = portfolioService.getPortfolios(request.keyword(), request.tags(), pageable);
+
+        return ResponseEntity.ok(ApiResponse.success(portfolioCards, "불러오기 성공"));
     }
 }

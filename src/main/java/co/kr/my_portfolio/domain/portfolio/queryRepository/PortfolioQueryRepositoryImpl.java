@@ -1,0 +1,67 @@
+package co.kr.my_portfolio.domain.portfolio.queryRepository;
+
+import co.kr.my_portfolio.domain.portfolio.PortfolioCard;
+import co.kr.my_portfolio.domain.portfolio.QPortfolio;
+import co.kr.my_portfolio.domain.portfolio.QPortfolioCard;
+import co.kr.my_portfolio.domain.portfolio.QPortfolioTagMapping;
+import co.kr.my_portfolio.domain.tag.QTag;
+import co.kr.my_portfolio.domain.user.QUser;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+@RequiredArgsConstructor
+public class PortfolioQueryRepositoryImpl implements PortfolioQueryRepository {
+
+    private final JPAQueryFactory queryFactory;
+
+    @Override
+    public Page<PortfolioCard> findCardList(String keyword, List<String> tagNames, Pageable pageable) {
+        QPortfolio p = QPortfolio.portfolio;
+        QUser u = QUser.user;
+        QPortfolioTagMapping m = QPortfolioTagMapping.portfolioTagMapping;
+        QTag t = QTag.tag;
+
+        // 기본 조건
+        BooleanBuilder condition = new BooleanBuilder();
+        if (keyword != null && !keyword.isBlank()) {
+            condition.and(p.title.containsIgnoreCase(keyword)
+                    .or(p.content.containsIgnoreCase(keyword)));
+        }
+
+        // Tag 검색: 태그 이름 목록을 포함하는 Portfolio 만 필터링
+        JPAQuery<Long> countQuery = queryFactory
+                .select(p.id.countDistinct())
+                .from(p)
+                .join(p.tags, m)
+                .join(m.tag, t)
+                .where(condition
+                        .and(t.name.in(tagNames)))
+                .groupBy(p.id)
+                .having(t.name.countDistinct().eq((long) tagNames.size()));
+
+        List<Long> portfolioIds = countQuery
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        List<PortfolioCard> content = queryFactory
+                .select(new QPortfolioCard(p.id, p.thumbnail, p.title, p.likeCount, u.nickname))
+                .from(p)
+                .join(u).on(p.authorId.eq(u.id))
+                .where(p.id.in(portfolioIds))
+                .fetch();
+
+        long total = (long) countQuery.fetch().size();
+
+        return new PageImpl<>(content, pageable, total);
+    }
+}

@@ -1,6 +1,8 @@
 package co.kr.my_portfolio.application.portfolio;
 
 import co.kr.my_portfolio.domain.portfolio.Portfolio;
+import co.kr.my_portfolio.domain.portfolio.PortfolioCard;
+import co.kr.my_portfolio.domain.portfolio.queryRepository.PortfolioQueryRepositoryImpl;
 import co.kr.my_portfolio.domain.portfolio.repository.PortfolioRepository;
 import co.kr.my_portfolio.domain.tag.Tag;
 import co.kr.my_portfolio.domain.tag.repository.TagRepository;
@@ -8,6 +10,8 @@ import co.kr.my_portfolio.infrastructure.security.AuthenticatedUserProvider;
 import co.kr.my_portfolio.presentation.portfolio.dto.PortfolioSaveRequest;
 import co.kr.my_portfolio.presentation.portfolio.dto.PortfolioUpdateRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,26 +24,62 @@ public class PortfolioService {
     private final PortfolioRepository portfolioRepository;
     private final TagRepository tagRepository;
     private final AuthenticatedUserProvider authenticatedUserProvider;
+    private final PortfolioQueryRepositoryImpl portfolioQueryRepository;
+    private final PortfolioQueryRepositoryImpl portfolioQueryRepositoryImpl;
 
-    public void savePortfolio(PortfolioSaveRequest request) {
-        Long userId = authenticatedUserProvider.getAuthenticatedUser().getId();
-
-    }
-
+    // 포트폴리오 등록
     @Transactional
-    public void updatePortfolioAndTags(PortfolioUpdateRequest request) {
-        Portfolio portfolio = portfolioRepository.findWithTagsById(request.getPortfolioId());
-        portfolio.updateWithoutTags(request);
-
+    public void savePortfolio(PortfolioSaveRequest request) {
+        // 유저 아이디 가져오기
+        Long userId = authenticatedUserProvider.getAuthenticatedUser().getId();
+        
+        // request, userId로 Portfolio 생성
+        Portfolio portfolio = Portfolio.of(request, userId);
+        
+        // 들어온 테그 이름 리스트 추출
         List<String> tagNames = request.getTags();
-
+        
+        // 들어온 테그 -> 테그 도메인 리스트로 변환 + 없는 테그 등록
         List<Tag> resolvedTags = tagNames.stream()
                 .map(name -> tagRepository.findByName(name)
                         .orElseGet(() -> tagRepository.save(Tag.of(name)))
                 ).toList();
 
+        // 테그 매핑 들어온 테그 도메인 리스트와 일치시키기
+        portfolio.syncTags(resolvedTags);
+        
+        // 포트폴리오 저장
+        portfolioRepository.save(portfolio);
+    }
+    
+    // 포트폴리오 수정
+    @Transactional
+    public void updatePortfolioAndTags(PortfolioUpdateRequest request) {
+        // 포트폴리오 id로 포트폴리오 불러오기
+        Portfolio portfolio = portfolioRepository.findWithTagsById(request.getPortfolioId());
+        
+        // request 로 Tag 외의 내용으로 수정
+        portfolio.updateWithoutTags(request);
+
+        // 들어온 테그 이름 리스트 추출
+        List<String> tagNames = request.getTags();
+
+        // 들어온 테그 -> 테그 도메인 리스트로 변환 + 없는 테그 등록
+        List<Tag> resolvedTags = tagNames.stream()
+                .map(name -> tagRepository.findByName(name)
+                        .orElseGet(() -> tagRepository.save(Tag.of(name)))
+                ).toList();
+        
+        // 테그 매핑 들어온 테그 도메인 리스트와 일치시키기
         portfolio.syncTags(resolvedTags);
 
+        // 포트폴리오 저장
         portfolioRepository.save(portfolio);
+    }
+
+    // 포트폴리오 가져오기 (Card + Pagination)
+    @Transactional
+    public Page<PortfolioCard> getPortfolios(String keyword, List<String> tagNames, Pageable pageable) {
+        return portfolioQueryRepositoryImpl.findCardList(keyword, tagNames, pageable);
     }
 }
