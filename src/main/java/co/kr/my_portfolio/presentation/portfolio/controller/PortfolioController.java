@@ -36,20 +36,9 @@ public class PortfolioController {
     }
 
     // 포트폴리오 보기
-    @PostMapping("/get")
-    public ResponseEntity<ApiResponse<Page<PortfolioCard>>> getPortfolio(@RequestBody PortfolioSearchRequest request) {
-        Pageable pageable = PageRequest.of(
-                request.page(),
-                request.size(),
-                Sort.by(request.sort().stream()
-                        .map(s -> s.direction().equalsIgnoreCase("DESC")
-                                ? Sort.Order.desc(s.property())
-                                : Sort.Order.asc(s.property()))
-                        .toList())
-        );
-
-        Page<PortfolioCard> portfolioCards = portfolioService.getPortfolios(request.keyword(), request.tags(), pageable);
-
+    @PostMapping("/search")
+    public ResponseEntity<ApiResponse<Page<PortfolioCard>>> getPortfolioCards(@RequestBody PortfolioSearchRequest request) {
+        Page<PortfolioCard> portfolioCards = portfolioService.getPortfolioCards(request);
         return ResponseEntity.ok(ApiResponse.success(portfolioCards, "불러오기 성공"));
     }
 }
