@@ -80,6 +80,12 @@ public class PortfolioService {
         // 포트폴리오 저장
         portfolioRepository.save(portfolio);
     }
+    
+    // 포트폴리오 삭제
+    @Transactional
+    public void deletePortfolio(Long portfolioId) {
+        portfolioRepository.deleteById(portfolioId);
+    }
 
     // 포트폴리오 가져오기 (Card + Pagination)
     @Transactional
