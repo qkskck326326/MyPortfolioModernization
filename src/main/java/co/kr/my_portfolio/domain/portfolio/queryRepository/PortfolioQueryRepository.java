@@ -7,5 +7,5 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface PortfolioQueryRepository {
-    Page<PortfolioCard> findCardList(String keyword, List<String> tagNames, Pageable pageable);
+    Page<PortfolioCard> getPortfolioCards(String keyword, List<String> tagNames, Pageable pageable);
 }

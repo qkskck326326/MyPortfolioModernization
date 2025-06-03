@@ -24,7 +24,7 @@ public class PortfolioQueryRepositoryImpl implements PortfolioQueryRepository {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Page<PortfolioCard> findCardList(String keyword, List<String> tagNames, Pageable pageable) {
+    public Page<PortfolioCard> getPortfolioCards(String keyword, List<String> tagNames, Pageable pageable) {
         QPortfolio p = QPortfolio.portfolio;
         QUser u = QUser.user;
         QPortfolioTagMapping m = QPortfolioTagMapping.portfolioTagMapping;

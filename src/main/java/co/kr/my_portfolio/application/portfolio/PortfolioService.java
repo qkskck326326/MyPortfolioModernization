@@ -6,12 +6,16 @@ import co.kr.my_portfolio.domain.portfolio.queryRepository.PortfolioQueryReposit
 import co.kr.my_portfolio.domain.portfolio.repository.PortfolioRepository;
 import co.kr.my_portfolio.domain.tag.Tag;
 import co.kr.my_portfolio.domain.tag.repository.TagRepository;
+import co.kr.my_portfolio.global.exception.custom.PortfolioNotFoundException;
 import co.kr.my_portfolio.infrastructure.security.AuthenticatedUserProvider;
 import co.kr.my_portfolio.presentation.portfolio.dto.PortfolioSaveRequest;
 import co.kr.my_portfolio.presentation.portfolio.dto.PortfolioUpdateRequest;
+import co.kr.my_portfolio.presentation.portfolio.dto.search.PortfolioSearchRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -79,7 +83,24 @@ public class PortfolioService {
 
     // 포트폴리오 가져오기 (Card + Pagination)
     @Transactional
-    public Page<PortfolioCard> getPortfolios(String keyword, List<String> tagNames, Pageable pageable) {
-        return portfolioQueryRepositoryImpl.findCardList(keyword, tagNames, pageable);
+    public Page<PortfolioCard> getPortfolioCards(PortfolioSearchRequest request) {
+        Pageable pageable = PageRequest.of(
+                request.page(),
+                request.size(),
+                Sort.by(request.sort().stream()
+                        .map(s -> s.direction().equalsIgnoreCase("DESC")
+                                ? Sort.Order.desc(s.property())
+                                : Sort.Order.asc(s.property()))
+                        .toList())
+        );
+
+        return portfolioQueryRepositoryImpl.getPortfolioCards(request.keyword(), request.tags(), pageable);
+    }
+
+    // 포트폴리오 상세
+    @Transactional
+    public Portfolio getPortfolio(Long portfolioId) {
+        return portfolioRepository.findById(portfolioId)
+                .orElseThrow(() -> new PortfolioNotFoundException("해당 포트폴리오가 존재하지 않습니다."));
     }
 }
