@@ -28,17 +28,19 @@ public class PortfolioService {
     private final PortfolioRepository portfolioRepository;
     private final TagRepository tagRepository;
     private final AuthenticatedUserProvider authenticatedUserProvider;
-    private final PortfolioQueryRepositoryImpl portfolioQueryRepository;
     private final PortfolioQueryRepositoryImpl portfolioQueryRepositoryImpl;
+    private final UserRepository userRepository;
 
     // 포트폴리오 등록
     @Transactional
     public void savePortfolio(PortfolioSaveRequest request) {
         // 유저 아이디 가져오기
         Long userId = authenticatedUserProvider.getAuthenticatedUser().getId();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("존재하지 않는 유저입니다."));
         
-        // request, userId로 Portfolio 생성
-        Portfolio portfolio = Portfolio.of(request, userId);
+        // request, user로 Portfolio 생성
+        Portfolio portfolio = Portfolio.of(request, user);
         
         // 들어온 테그 이름 리스트 추출
         List<String> tagNames = request.getTags();

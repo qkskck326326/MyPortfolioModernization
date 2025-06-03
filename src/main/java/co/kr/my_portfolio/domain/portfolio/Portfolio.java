@@ -2,6 +2,7 @@ package co.kr.my_portfolio.domain.portfolio;
 
 import co.kr.my_portfolio.common.domain.BaseTimeEntity;
 import co.kr.my_portfolio.domain.tag.Tag;
+import co.kr.my_portfolio.domain.user.User;
 import co.kr.my_portfolio.presentation.portfolio.dto.PortfolioSaveRequest;
 import co.kr.my_portfolio.presentation.portfolio.dto.PortfolioUpdateRequest;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -21,7 +22,10 @@ public class Portfolio extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long authorId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "author_id")
+    private User author;
+
     private String title;
     private String thumbnail;
 
@@ -34,9 +38,9 @@ public class Portfolio extends BaseTimeEntity {
     @JsonManagedReference
     private final List<PortfolioTagMapping> tags = new ArrayList<>();
 
-    public static Portfolio of(PortfolioSaveRequest request, Long authorId) {
+    public static Portfolio of(PortfolioSaveRequest request, User author) {
         Portfolio portfolio = new Portfolio();
-        portfolio.authorId = authorId;
+        portfolio.author = author;
         portfolio.title = request.getTitle();
         portfolio.thumbnail = request.getThumbnail();
         portfolio.content = request.getContent();
