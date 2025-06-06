@@ -57,6 +57,14 @@ public class User extends BaseTimeEntity {
         this.birth = birth;
     }
 
+    private User (Long userId){
+        this.id = userId;
+    }
+
+    public static User withId(Long userId) {
+        return new User(userId);
+    }
+
     public void updateProfile(String nickname, String userThumbnail, String introduce,
                               String github, LocalDate birth) {
         if (nickname != null) this.nickname = nickname;
