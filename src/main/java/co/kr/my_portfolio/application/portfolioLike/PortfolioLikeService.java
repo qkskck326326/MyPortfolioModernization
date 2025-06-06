@@ -5,16 +5,16 @@ import co.kr.my_portfolio.domain.portfolio.repository.PortfolioRepository;
 import co.kr.my_portfolio.domain.portfolioLike.PortfolioLike;
 import co.kr.my_portfolio.domain.portfolioLike.repository.PortfolioLikeRepository;
 import co.kr.my_portfolio.domain.user.User;
-import co.kr.my_portfolio.domain.user.UserRepository;
 import co.kr.my_portfolio.global.exception.custom.PortfolioNotFoundException;
 import co.kr.my_portfolio.infrastructure.security.AuthenticatedUser;
 import co.kr.my_portfolio.infrastructure.security.AuthenticatedUserProvider;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class PortfolioLikeService {
     private final PortfolioRepository portfolioRepository;
     private final PortfolioLikeRepository portfolioLikeRepository;
