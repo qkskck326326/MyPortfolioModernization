@@ -89,4 +89,12 @@ public class Portfolio extends BaseTimeEntity {
         toRemove.forEach(this::removeTag);
         toAdd.forEach(this::addTag);
     }
+
+    public void increaseLikeCount() {
+        this.likeCount++;
+    }
+
+    public void decreaseLikeCount() {
+        this.likeCount--;
+    }
 }
