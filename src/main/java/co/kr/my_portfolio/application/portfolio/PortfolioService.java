@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -97,48 +98,48 @@ public class PortfolioService {
     @Transactional
     public Page<PortfolioCard> getPortfolioCards(PortfolioSearchRequest request) {
         Pageable pageable = PageRequest.of(
-                request.page(),
-                request.size(),
-                Sort.by(request.sort().stream()
-                        .map(s -> s.direction().equalsIgnoreCase("DESC")
-                                ? Sort.Order.desc(s.property())
-                                : Sort.Order.asc(s.property()))
-                        .toList())
+                request.getPage(),
+                request.getSize(),
+                Sort.by(request.getSort().stream()
+                        .map(s -> s.getDirection() == Sort.Direction.DESC
+                                ? Sort.Order.desc(s.getField())
+                                : Sort.Order.asc(s.getField()))
+                        .collect(Collectors.toList()))
         );
 
-        return portfolioQueryRepositoryImpl.getPortfolioCards(request.keyword(), request.tags(), pageable);
+        return portfolioQueryRepositoryImpl.getPortfolioCards(request.getKeyword(), request.getTags(), pageable);
     }
 
     // 내가 쓴 글 목록
     public Page<PortfolioCard> getMyPortfolios(PortfolioSearchRequest request) {
         Pageable pageable = PageRequest.of(
-                request.page(),
-                request.size(),
-                Sort.by(request.sort().stream()
-                        .map(s -> s.direction().equalsIgnoreCase("DESC")
-                                ? Sort.Order.desc(s.property())
-                                : Sort.Order.asc(s.property()))
-                        .toList())
+                request.getPage(),
+                request.getSize(),
+                Sort.by(request.getSort().stream()
+                        .map(s -> s.getDirection() == Sort.Direction.DESC
+                                ? Sort.Order.desc(s.getField())
+                                : Sort.Order.asc(s.getField()))
+                        .collect(Collectors.toList()))
         );
 
-        return portfolioQueryRepositoryImpl.findMyPortfolios(request.keyword(), request.tags(), pageable);
+        return portfolioQueryRepositoryImpl.findMyPortfolios(request.getKeyword(), request.getTags(), pageable);
     }
 
     // 내가 좋아요 표시한 글 목록
     @Transactional
-    public Page<PortfolioCard> getMyLikedPortfolios(PortfolioSearchRequest request){
+    public Page<PortfolioCard> getMyLikedPortfolios(PortfolioSearchRequest request) {
         Long userId = authenticatedUserProvider.getAuthenticatedUser().getId();
         Pageable pageable = PageRequest.of(
-                request.page(),
-                request.size(),
-                Sort.by(request.sort().stream()
-                        .map(s -> s.direction().equalsIgnoreCase("DESC")
-                                ? Sort.Order.desc(s.property())
-                                : Sort.Order.asc(s.property()))
-                        .toList())
+                request.getPage(),
+                request.getSize(),
+                Sort.by(request.getSort().stream()
+                        .map(s -> s.getDirection() == Sort.Direction.DESC
+                                ? Sort.Order.desc(s.getField())
+                                : Sort.Order.asc(s.getField()))
+                        .collect(Collectors.toList()))
         );
 
-        return portfolioQueryRepositoryImpl.findLikedPortfoliosByUserId(request.keyword(), request.tags(), userId, pageable);
+        return portfolioQueryRepositoryImpl.findLikedPortfoliosByUserId(request.getKeyword(), request.getTags(), userId, pageable);
     }
 
     // 포트폴리오 상세
