@@ -20,12 +20,14 @@ public class PortfolioLike extends BaseTimeEntity {
     private PortfolioLikeId id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "portfolio_id", nullable = false)
-    private Portfolio portfolio;
+    @MapsId("userId")
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @MapsId("portfolioId")
+    @JoinColumn(name = "portfolio_id")
+    private Portfolio portfolio;
 
     @Builder
     public PortfolioLike(User user, Portfolio portfolio) {
