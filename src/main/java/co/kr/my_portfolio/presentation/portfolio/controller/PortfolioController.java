@@ -40,9 +40,16 @@ public class PortfolioController {
         return ResponseEntity.ok(ApiResponse.success(null, "포트폴리오를 성공적으로 삭제하였습니다."));
     }
 
-    // 포트폴리오 보기
+    // 포트폴리오 검색 & 불러오기
     @PostMapping("/search")
     public ResponseEntity<ApiResponse<Page<PortfolioCard>>> getPortfolioCards(@RequestBody PortfolioSearchRequest request) {
+        Page<PortfolioCard> portfolioCards = portfolioService.getPortfolioCards(request);
+        return ResponseEntity.ok(ApiResponse.success(portfolioCards, "불러오기 성공"));
+    }
+    
+    // 내가 쓴 포트폴리오 검색 & 불러오기
+    @PostMapping("/search/my")
+    public ResponseEntity<ApiResponse<Page<PortfolioCard>>> getMyPortfolioCards(@RequestBody PortfolioSearchRequest request) {
         Page<PortfolioCard> portfolioCards = portfolioService.getPortfolioCards(request);
         return ResponseEntity.ok(ApiResponse.success(portfolioCards, "불러오기 성공"));
     }

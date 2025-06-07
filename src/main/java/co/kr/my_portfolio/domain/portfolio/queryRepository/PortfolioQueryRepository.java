@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface PortfolioQueryRepository {
     Page<PortfolioCard> getPortfolioCards(String keyword, List<String> tagNames, Pageable pageable);
+    Page<PortfolioCard> findMyPortfolios(String keyword, List<String> tagNames, Pageable pageable);
 }

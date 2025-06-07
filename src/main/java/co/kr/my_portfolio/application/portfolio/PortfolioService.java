@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -109,6 +110,21 @@ public class PortfolioService {
         return portfolioQueryRepositoryImpl.getPortfolioCards(request.keyword(), request.tags(), pageable);
     }
 
+    // 내가 쓴 글 목록
+    public Page<PortfolioCard> getMyPortfolios(PortfolioSearchRequest request) {
+        Pageable pageable = PageRequest.of(
+                request.page(),
+                request.size(),
+                Sort.by(request.sort().stream()
+                        .map(s -> s.direction().equalsIgnoreCase("DESC")
+                                ? Sort.Order.desc(s.property())
+                                : Sort.Order.asc(s.property()))
+                        .toList())
+        );
+
+        return portfolioQueryRepositoryImpl.findMyPortfolios(request.keyword(), request.tags(), pageable);
+    }
+
     // 포트폴리오 상세
     @Transactional
     public PortfolioDetailResponse getPortfolio(Long portfolioId) {
@@ -117,4 +133,8 @@ public class PortfolioService {
 
         return PortfolioDetailResponse.of(portfolio);
     }
+
+    // TODO : 내가 좋아요 표시한 글 목록
+
+    // TODO :
 }
