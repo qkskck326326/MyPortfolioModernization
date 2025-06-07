@@ -50,7 +50,7 @@ public class PortfolioController {
     // 내가 쓴 포트폴리오 검색 & 불러오기
     @PostMapping("/search/my")
     public ResponseEntity<ApiResponse<Page<PortfolioCard>>> getMyPortfolioCards(@RequestBody PortfolioSearchRequest request) {
-        Page<PortfolioCard> portfolioCards = portfolioService.getPortfolioCards(request);
+        Page<PortfolioCard> portfolioCards = portfolioService.getMyPortfolios(request);
         return ResponseEntity.ok(ApiResponse.success(portfolioCards, "불러오기 성공"));
     }
     
