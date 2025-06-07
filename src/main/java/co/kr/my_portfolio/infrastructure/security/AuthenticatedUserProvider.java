@@ -23,7 +23,9 @@ public class AuthenticatedUserProvider {
         // Long 형태로 변환
         Long userId = Long.parseLong((String) jwt.getPrincipal());
         // Role 형태로 변환
-        Role role = Role.valueOf(jwt.getRole());
+        System.out.println("jwt.getRole() = " + jwt.getRole());
+        String roleStr = jwt.getRole().replace("ROLE_", "");
+        Role role = Role.valueOf(roleStr);
         
         // 인증 유저로 반환
         return new AuthenticatedUser(userId, role);
