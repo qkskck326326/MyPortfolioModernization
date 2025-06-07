@@ -1,6 +1,12 @@
 package co.kr.my_portfolio.presentation.portfolio.dto.search;
 
-public record SortRequest(
-        String property,     // 정렬할 필드명
-        String direction     // ASC or DESC
-) {}
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.springframework.data.domain.Sort;
+
+@Getter
+@NoArgsConstructor
+public class SortRequest {
+    private String field;
+    private Sort.Direction direction;
+}

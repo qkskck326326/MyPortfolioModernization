@@ -1,11 +1,26 @@
 package co.kr.my_portfolio.presentation.portfolio.dto.search;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
 import java.util.List;
 
-public record PortfolioSearchRequest(
-        String keyword,                // 검색 키워드 (nullable)
-        List<String> tags,            // 태그 리스트 (nullable)
-        int page,                     // 페이지 번호 (0부터 시작)
-        int size,                     // 페이지 크기
-        List<SortRequest> sort        // 정렬 기준 리스트
-) {}
+@Getter
+@NoArgsConstructor
+public class PortfolioSearchRequest {
+
+    private String keyword;
+    private List<String> tags;
+    private int page;
+    private int size;
+    private List<SortRequest> sort = new ArrayList<>();
+
+    public PortfolioSearchRequest(String keyword, List<String> tags, int page, int size, List<SortRequest> sort) {
+        this.keyword = keyword;
+        this.tags = tags != null ? tags : new ArrayList<>();
+        this.page = page;
+        this.size = size;
+        this.sort = sort != null ? sort : new ArrayList<>();
+    }
+}
