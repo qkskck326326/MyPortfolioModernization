@@ -53,6 +53,13 @@ public class PortfolioController {
         Page<PortfolioCard> portfolioCards = portfolioService.getPortfolioCards(request);
         return ResponseEntity.ok(ApiResponse.success(portfolioCards, "불러오기 성공"));
     }
+    
+    // 내가 좋아요 표시한 포트폴리오 불러오기
+    @PostMapping("search/my/liked")
+    public ResponseEntity<ApiResponse<Page<PortfolioCard>>> getMyLikedPortfolios(@RequestBody PortfolioSearchRequest request){
+        Page<PortfolioCard> portfolioCards = portfolioService.getMyLikedPortfolios(request);
+        return ResponseEntity.ok(ApiResponse.success(portfolioCards, "불러오기 성공"));
+    }
 
     // 포트폴리오 상세
     @GetMapping("/{portfolioId}")

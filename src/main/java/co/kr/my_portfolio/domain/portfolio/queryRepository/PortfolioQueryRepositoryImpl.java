@@ -1,21 +1,25 @@
 package co.kr.my_portfolio.domain.portfolio.queryRepository;
 
-import co.kr.my_portfolio.domain.portfolio.PortfolioCard;
-
-import co.kr.my_portfolio.domain.portfolio.QPortfolio;
-import co.kr.my_portfolio.domain.portfolio.QPortfolioCard;
-import co.kr.my_portfolio.domain.portfolio.QPortfolioTagMapping;
+import co.kr.my_portfolio.domain.portfolio.*;
+import co.kr.my_portfolio.domain.portfolioLike.QPortfolioLike;
 import co.kr.my_portfolio.domain.tag.QTag;
 import co.kr.my_portfolio.domain.user.QUser;
+import co.kr.my_portfolio.presentation.portfolio.dto.search.SortRequest;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.dsl.PathBuilder;
+import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -31,21 +35,17 @@ public class PortfolioQueryRepositoryImpl implements PortfolioQueryRepository {
         QPortfolioTagMapping m = QPortfolioTagMapping.portfolioTagMapping;
         QTag t = QTag.tag;
 
-        // 기본 조건
         BooleanBuilder condition = new BooleanBuilder();
         if (keyword != null && !keyword.isBlank()) {
-            condition.and(p.title.containsIgnoreCase(keyword)
-                    .or(p.content.containsIgnoreCase(keyword)));
+            condition.and(p.title.containsIgnoreCase(keyword).or(p.content.containsIgnoreCase(keyword)));
         }
 
-        // Tag 검색: 태그 이름 목록을 포함하는 Portfolio 만 필터링
         JPAQuery<Long> countQuery = queryFactory
                 .select(p.id.countDistinct())
                 .from(p)
                 .join(p.tags, m)
                 .join(m.tag, t)
-                .where(condition
-                        .and(t.name.in(tagNames)))
+                .where(condition.and(t.name.in(tagNames)))
                 .groupBy(p.id)
                 .having(t.name.countDistinct().eq((long) tagNames.size()));
 
@@ -59,9 +59,10 @@ public class PortfolioQueryRepositoryImpl implements PortfolioQueryRepository {
                 .from(p)
                 .join(p.author, u)
                 .where(p.id.in(portfolioIds))
+                .orderBy(getOrderSpecifiers(pageable.getSort()).toArray(new OrderSpecifier[0]))
                 .fetch();
 
-        long total = (long) countQuery.fetch().size();
+        long total = countQuery.fetch().size();
 
         return new PageImpl<>(content, pageable, total);
     }
@@ -73,22 +74,16 @@ public class PortfolioQueryRepositoryImpl implements PortfolioQueryRepository {
         QPortfolioTagMapping m = QPortfolioTagMapping.portfolioTagMapping;
         QTag t = QTag.tag;
 
-        // 검색 조건
         BooleanBuilder condition = new BooleanBuilder();
         if (keyword != null && !keyword.isBlank()) {
-            condition.and(
-                    p.title.containsIgnoreCase(keyword)
-                            .or(p.content.containsIgnoreCase(keyword))
-            );
+            condition.and(p.title.containsIgnoreCase(keyword).or(p.content.containsIgnoreCase(keyword)));
         }
 
-        // 태그 조건 (AND 포함)
         BooleanBuilder tagCondition = new BooleanBuilder();
         if (tagNames != null && !tagNames.isEmpty()) {
             tagCondition.and(t.name.in(tagNames));
         }
 
-        // ID 쿼리: 조건에 맞는 포트폴리오 ID만 추출
         List<Long> portfolioIds = queryFactory
                 .select(p.id)
                 .from(p)
@@ -105,23 +100,14 @@ public class PortfolioQueryRepositoryImpl implements PortfolioQueryRepository {
             return new PageImpl<>(List.of(), pageable, 0);
         }
 
-        // 본문 조회: ID 기반 + User nickname 포함
         List<PortfolioCard> content = queryFactory
-                .select(new QPortfolioCard(
-                        p.id,
-                        p.thumbnail,
-                        p.title,
-                        p.likeCount,
-                        p.author.nickname,
-                        p.createdAt
-                ))
+                .select(new QPortfolioCard(p.id, p.thumbnail, p.title, p.likeCount, p.author.nickname, p.createdAt))
                 .from(p)
                 .join(p.author, u)
                 .where(p.id.in(portfolioIds))
-                .orderBy(p.createdAt.desc())
+                .orderBy(getOrderSpecifiers(pageable.getSort()).toArray(new OrderSpecifier[0]))
                 .fetch();
 
-        // 전체 개수
         long total = queryFactory
                 .select(p.id.countDistinct())
                 .from(p)
@@ -134,5 +120,62 @@ public class PortfolioQueryRepositoryImpl implements PortfolioQueryRepository {
                 .size();
 
         return new PageImpl<>(content, pageable, total);
+    }
+
+    @Override
+    public Page<PortfolioCard> findLikedPortfoliosByUserId(String keyword, List<String> tagNames, Long userId, Pageable pageable) {
+        QPortfolio p = QPortfolio.portfolio;
+        QUser u = QUser.user;
+        QPortfolioLike pl = QPortfolioLike.portfolioLike;
+        QPortfolioTagMapping ptm = QPortfolioTagMapping.portfolioTagMapping;
+        QTag t = QTag.tag;
+
+        BooleanBuilder builder = new BooleanBuilder();
+        builder.and(pl.user.id.eq(userId));
+        if (keyword != null && !keyword.isBlank()) {
+            builder.and(p.title.containsIgnoreCase(keyword));
+        }
+
+        JPQLQuery<PortfolioCard> query = queryFactory
+                .select(new QPortfolioCard(p.id, p.thumbnail, p.title, p.likeCount, u.nickname, p.createdAt))
+                .from(pl)
+                .join(pl.portfolio, p)
+                .join(p.author, u)
+                .leftJoin(ptm).on(ptm.portfolio.eq(p))
+                .leftJoin(ptm.tag, t)
+                .where(builder)
+                .distinct();
+
+        if (tagNames != null && !tagNames.isEmpty()) {
+            query.where(t.name.in(tagNames));
+        }
+
+        List<PortfolioCard> content = query
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(getOrderSpecifiers(pageable.getSort()).toArray(new OrderSpecifier[0]))
+                .fetch();
+
+        long total = queryFactory
+                .select(p.id.countDistinct())
+                .from(pl)
+                .join(pl.portfolio, p)
+                .leftJoin(p.tags, ptm)
+                .leftJoin(ptm.tag, t)
+                .where(builder.and(tagNames != null && !tagNames.isEmpty() ? t.name.in(tagNames) : null))
+                .fetch()
+                .size();
+
+        return new PageImpl<>(content, pageable, total);
+    }
+
+    private List<OrderSpecifier<?>> getOrderSpecifiers(Sort sort) {
+        List<OrderSpecifier<?>> orderSpecifiers = new ArrayList<>();
+        for (Sort.Order order : sort) {
+            PathBuilder<Portfolio> pathBuilder = new PathBuilder<>(Portfolio.class, "portfolio");
+            Order direction = order.getDirection().isDescending() ? Order.DESC : Order.ASC;
+            orderSpecifiers.add(new OrderSpecifier<>(direction, pathBuilder.getComparable(order.getProperty(), Comparable.class)));
+        }
+        return orderSpecifiers;
     }
 }
