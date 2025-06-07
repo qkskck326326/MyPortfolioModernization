@@ -8,7 +8,6 @@ import co.kr.my_portfolio.domain.user.User;
 import co.kr.my_portfolio.global.exception.custom.PortfolioNotFoundException;
 import co.kr.my_portfolio.infrastructure.security.AuthenticatedUser;
 import co.kr.my_portfolio.infrastructure.security.AuthenticatedUserProvider;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
