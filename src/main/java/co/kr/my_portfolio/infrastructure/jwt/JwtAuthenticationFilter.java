@@ -1,6 +1,6 @@
 package co.kr.my_portfolio.infrastructure.jwt;
 
-import co.kr.my_portfolio.global.response.ApiResponse;
+import co.kr.my_portfolio.global.response.CommonResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -74,8 +74,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json");
 
-        ApiResponse<Void> apiResponse = ApiResponse.fail(message);
-        objectMapper.writeValue(response.getWriter(), apiResponse);
+        CommonResponse<Void> commonResponse = CommonResponse.fail(message);
+        objectMapper.writeValue(response.getWriter(), commonResponse);
         response.getWriter().flush();
     }
 }

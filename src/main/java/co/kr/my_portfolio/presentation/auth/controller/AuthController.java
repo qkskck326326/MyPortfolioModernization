@@ -2,10 +2,9 @@ package co.kr.my_portfolio.presentation.auth.controller;
 
 import co.kr.my_portfolio.presentation.auth.dto.jwt.TokenResponse;
 import co.kr.my_portfolio.application.auth.LoginService;
-import co.kr.my_portfolio.global.response.ApiResponse;
+import co.kr.my_portfolio.global.response.CommonResponse;
 import co.kr.my_portfolio.presentation.auth.dto.login.EmailLoginRequest;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,11 +31,11 @@ public class AuthController {
                     - email, password 생략 불가.
                     """)
     @PostMapping("/login/email")
-    public ResponseEntity<ApiResponse<TokenResponse>> loginWithEmail(
+    public ResponseEntity<CommonResponse<TokenResponse>> loginWithEmail(
             @Valid @RequestBody EmailLoginRequest request) {
 
         TokenResponse tokens = loginService.login(request.toCommand());
-        return ResponseEntity.ok(ApiResponse.success(tokens));
+        return ResponseEntity.ok(CommonResponse.success(tokens));
     }
 
     // 로그아웃
@@ -47,10 +46,10 @@ public class AuthController {
                     - JWT 인증( 로그인 )
                     """)
     @PostMapping("/logout")
-    public ResponseEntity<ApiResponse<Void>> logout(HttpServletRequest request) {
+    public ResponseEntity<CommonResponse<Void>> logout(HttpServletRequest request) {
         String refreshToken = extractTokenFromHeader(request);
         loginService.logout(refreshToken);
-        return ResponseEntity.ok(ApiResponse.success(null, "로그아웃 되었습니다."));
+        return ResponseEntity.ok(CommonResponse.success(null, "로그아웃 되었습니다."));
     }
 
     // 토큰 재생성
@@ -61,10 +60,10 @@ public class AuthController {
                     - JWT 인증( Refresh Token )
                     """)
     @PostMapping("/reissue")
-    public ResponseEntity<ApiResponse<TokenResponse>> reissue(HttpServletRequest request) {
+    public ResponseEntity<CommonResponse<TokenResponse>> reissue(HttpServletRequest request) {
         String refreshToken = extractTokenFromHeader(request);
         TokenResponse tokenResponse = loginService.reissue(refreshToken);
-        return ResponseEntity.ok(ApiResponse.success(tokenResponse));
+        return ResponseEntity.ok(CommonResponse.success(tokenResponse));
     }
 
     // Header에서 Bearer 토큰 꺼내는 공통 메서드

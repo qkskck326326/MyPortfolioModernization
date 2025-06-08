@@ -1,6 +1,6 @@
 package co.kr.my_portfolio.presentation.user.controller;
 
-import co.kr.my_portfolio.global.response.ApiResponse;
+import co.kr.my_portfolio.global.response.CommonResponse;
 import co.kr.my_portfolio.infrastructure.jwt.JwtAuthenticationToken;
 import co.kr.my_portfolio.presentation.user.dto.PasswordChangeRequest;
 import co.kr.my_portfolio.presentation.user.dto.UserProfileResponse;
@@ -21,29 +21,29 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/signup")
-    public ResponseEntity<ApiResponse<String>> signup(@RequestBody @Valid UserSignupRequest request) {
+    public ResponseEntity<CommonResponse<String>> signup(@RequestBody @Valid UserSignupRequest request) {
         userService.signup(request);
-        return ResponseEntity.ok(ApiResponse.success(null, "회원가입 완료"));
+        return ResponseEntity.ok(CommonResponse.success(null, "회원가입 완료"));
     }
 
     @GetMapping("/me")
-    public ResponseEntity<ApiResponse<UserProfileResponse>> getMyPage(@AuthenticationPrincipal JwtAuthenticationToken auth) {
+    public ResponseEntity<CommonResponse<UserProfileResponse>> getMyPage(@AuthenticationPrincipal JwtAuthenticationToken auth) {
         UserProfileResponse response = userService.getMyInfo();
-        return ResponseEntity.ok(ApiResponse.success(response));
+        return ResponseEntity.ok(CommonResponse.success(response));
     }
 
     @PutMapping("/me")
-    public ResponseEntity<ApiResponse<UserProfileResponse>> updateProfile(
+    public ResponseEntity<CommonResponse<UserProfileResponse>> updateProfile(
             @Valid @RequestBody UserProfileUpdateRequest request) {
         UserProfileResponse response = userService.updateMyProfile(request);
-        return ResponseEntity.ok(ApiResponse.success(response));
+        return ResponseEntity.ok(CommonResponse.success(response));
     }
 
     @PutMapping("/me/password")
-    public ResponseEntity<ApiResponse<?>> changePassword(
+    public ResponseEntity<CommonResponse<?>> changePassword(
             @Valid @RequestBody PasswordChangeRequest request) {
         userService.changePassword(request);
-        return ResponseEntity.ok(ApiResponse.success(null, "비밀번호가 성공적으로 변경되었습니다. \n 다시 로그인해주세요."));
+        return ResponseEntity.ok(CommonResponse.success(null, "비밀번호가 성공적으로 변경되었습니다. \n 다시 로그인해주세요."));
     }
 }
 

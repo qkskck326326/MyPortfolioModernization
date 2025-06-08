@@ -1,7 +1,7 @@
 package co.kr.my_portfolio.presentation.portfolioLike.controller;
 
 import co.kr.my_portfolio.application.portfolioLike.PortfolioLikeService;
-import co.kr.my_portfolio.global.response.ApiResponse;
+import co.kr.my_portfolio.global.response.CommonResponse;
 import co.kr.my_portfolio.presentation.portfolioLike.dto.PortfolioLikeToggleRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +15,7 @@ public class PortfolioLikeController {
 
     // 포트폴리오 좋아요 표시 토글
     @PostMapping
-    public ResponseEntity<ApiResponse<String>> portfolioLikeToggle(
+    public ResponseEntity<CommonResponse<String>> portfolioLikeToggle(
             @RequestBody PortfolioLikeToggleRequest request
     ){
         portfolioLikeService.portfolioLikeToggle(request.getPortfolioId());
