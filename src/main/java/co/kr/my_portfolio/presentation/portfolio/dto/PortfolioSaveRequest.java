@@ -8,7 +8,10 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-@Schema(description = "포트폴리오 등록 요청 DTO")
+@Schema(name = "PortfolioSaveRequest - 포트폴리오 등록 요청 DTO",
+        description = """
+                포트폴리오 등록 요청을 위한 DTO 입니다.
+                """)
 @Getter
 @NoArgsConstructor
 public class PortfolioSaveRequest {
@@ -21,7 +24,7 @@ public class PortfolioSaveRequest {
     @Size(max = 255, message = "썸네일 경로는 최대 255자까지 입력할 수 있습니다.")
     private String thumbnail;
 
-    @Schema(description = "상세 설명", example = "이 프로젝트는 포트폴리오를 등록/색인 하는 웹사이트 제작 프로젝트 입니다.")
+    @Schema(description = "내용", example = "이 프로젝트는 포트폴리오를 등록/색인 하는 웹사이트 제작 프로젝트 입니다.")
     @NotBlank(message = "내용이 입력되지 않았습니다.")
     @Size(max = 10000, message = "내용은 최대 10000자까지 입력할 수 있습니다.")
     private String content;

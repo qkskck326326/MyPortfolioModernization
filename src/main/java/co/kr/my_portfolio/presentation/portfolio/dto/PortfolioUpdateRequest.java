@@ -9,7 +9,10 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-@Schema(description = "포트폴리오 수정 요청 DTO")
+@Schema(name = "PortfolioUpdateRequest - 포트폴리오 수정 요청 DTO",
+        description = """
+                포트폴리오 수정 요청을 위한 DTO 입니다.
+                """)
 @Getter
 @NoArgsConstructor
 public class PortfolioUpdateRequest {
