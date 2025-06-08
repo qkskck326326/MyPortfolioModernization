@@ -38,7 +38,7 @@ public class PortfolioService {
 
     // 포트폴리오 등록
     @Transactional
-    public void savePortfolio(PortfolioSaveRequest request) {
+    public long savePortfolio(PortfolioSaveRequest request) {
         // 유저 아이디 가져오기
         Long userId = authenticatedUserProvider.getAuthenticatedUser().getId();
         User user = userRepository.findById(userId)
@@ -61,6 +61,8 @@ public class PortfolioService {
         
         // 포트폴리오 저장
         portfolioRepository.save(portfolio);
+
+        return portfolio.getId();
     }
     
     // 포트폴리오 수정
