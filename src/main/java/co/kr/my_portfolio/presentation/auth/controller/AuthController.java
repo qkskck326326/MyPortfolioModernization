@@ -5,6 +5,8 @@ import co.kr.my_portfolio.application.auth.LoginService;
 import co.kr.my_portfolio.global.response.CommonResponse;
 import co.kr.my_portfolio.presentation.auth.dto.login.EmailLoginRequest;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,6 +32,11 @@ public class AuthController {
                     API 사용 조건
                     - email, password 생략 불가.
                     """)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "로그인 성공"),
+            @ApiResponse(responseCode = "400", description = "요청 형식 오류 (validation 등)"),
+            @ApiResponse(responseCode = "401", description = "인증 실패 (이메일 또는 비밀번호 불일치)")
+    })
     @PostMapping("/login/email")
     public ResponseEntity<CommonResponse<TokenResponse>> loginWithEmail(
             @Valid @RequestBody EmailLoginRequest request) {
@@ -45,6 +52,10 @@ public class AuthController {
                     API 사용 조건
                     - JWT 인증( 로그인 )
                     """)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "정상적으로 로그아웃됨"),
+            @ApiResponse(responseCode = "401", description = "유효하지 않은 또는 만료된 토큰")
+    })
     @PostMapping("/logout")
     public ResponseEntity<CommonResponse<Void>> logout(HttpServletRequest request) {
         String refreshToken = extractTokenFromHeader(request);
@@ -59,6 +70,11 @@ public class AuthController {
                     API 사용 조건
                     - JWT 인증( Refresh Token )
                     """)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Access 토큰 재발급 성공"),
+            @ApiResponse(responseCode = "401", description = "Refresh 토큰이 유효하지 않음"),
+            @ApiResponse(responseCode = "403", description = "만료된 토큰이거나 접근 권한 없음")
+    })
     @PostMapping("/reissue")
     public ResponseEntity<CommonResponse<TokenResponse>> reissue(HttpServletRequest request) {
         String refreshToken = extractTokenFromHeader(request);

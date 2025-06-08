@@ -9,6 +9,8 @@ import co.kr.my_portfolio.presentation.portfolio.dto.PortfolioSaveResponse;
 import co.kr.my_portfolio.presentation.portfolio.dto.search.PortfolioSearchRequest;
 import co.kr.my_portfolio.presentation.portfolio.dto.PortfolioUpdateRequest;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -33,6 +35,11 @@ public class PortfolioController {
                     - title, content 생략 불가.
                     - thumbnail, tags 생략 가능.
                     """)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "등록 성공"),
+            @ApiResponse(responseCode = "400", description = "요청 값 누락 또는 Validation 오류"),
+            @ApiResponse(responseCode = "401", description = "JWT 인증 실패")
+    })
     @PostMapping
     public ResponseEntity<CommonResponse<PortfolioSaveResponse>> savePortfolio(@RequestBody @Valid PortfolioSaveRequest request) {
         long portfolioId = portfolioService.savePortfolio(request);
@@ -49,6 +56,13 @@ public class PortfolioController {
                     - portfolioId, title, content 생략 불가.
                     - thumbnail, tags 생략 가능.
                     """)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "수정 성공"),
+            @ApiResponse(responseCode = "400", description = "요청 값 누락 또는 Validation 오류"),
+            @ApiResponse(responseCode = "401", description = "JWT 인증 실패"),
+            @ApiResponse(responseCode = "403", description = "작성자 아닌 유저의 요청"),
+            @ApiResponse(responseCode = "404", description = "포트폴리오 없음")
+    })
     @PutMapping
     public ResponseEntity<CommonResponse<String>> updatePortfolio(@RequestBody @Valid PortfolioUpdateRequest request) {
         portfolioService.updatePortfolioAndTags(request);
@@ -64,6 +78,12 @@ public class PortfolioController {
                     - 해당 Portfolio 작성자와 동일한 아이디
                     - portfolioId 생략 불가.
                     """)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "삭제 성공"),
+            @ApiResponse(responseCode = "401", description = "JWT 인증 실패"),
+            @ApiResponse(responseCode = "403", description = "작성자 아님"),
+            @ApiResponse(responseCode = "404", description = "포트폴리오 없음")
+    })
     @DeleteMapping("/{portfolioId}")
     public ResponseEntity<CommonResponse<String>> deletePortfolio(@PathVariable long portfolioId){
         portfolioService.deletePortfolio(portfolioId);
@@ -83,6 +103,11 @@ public class PortfolioController {
                     - sort-direction 기본값 DESC
                         - sort-direction = DESC or ASC
                     """)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "검색 성공"),
+            @ApiResponse(responseCode = "400", description = "요청 값 오류"),
+            @ApiResponse(responseCode = "401", description = "JWT 인증 실패")
+    })
     @PostMapping("/search")
     public ResponseEntity<CommonResponse<Page<PortfolioCard>>> getPortfolioCards(@RequestBody PortfolioSearchRequest request) {
         Page<PortfolioCard> portfolioCards = portfolioService.getPortfolioCards(request);
@@ -102,6 +127,11 @@ public class PortfolioController {
                     - sort-direction 기본값 DESC
                         - sort-direction = DESC or ASC
                     """)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "검색 성공"),
+            @ApiResponse(responseCode = "400", description = "요청 값 오류"),
+            @ApiResponse(responseCode = "401", description = "JWT 인증 실패")
+    })
     @PostMapping("/search/my")
     public ResponseEntity<CommonResponse<Page<PortfolioCard>>> getMyPortfolioCards(@RequestBody PortfolioSearchRequest request) {
         Page<PortfolioCard> portfolioCards = portfolioService.getMyPortfolios(request);
@@ -121,6 +151,11 @@ public class PortfolioController {
                     - sort-direction 기본값 DESC
                         - sort-direction = DESC or ASC
                     """)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "검색 성공"),
+            @ApiResponse(responseCode = "400", description = "요청 값 오류"),
+            @ApiResponse(responseCode = "401", description = "JWT 인증 실패")
+    })
     @PostMapping("search/my/liked")
     public ResponseEntity<CommonResponse<Page<PortfolioCard>>> getMyLikedPortfolios(@RequestBody PortfolioSearchRequest request){
         Page<PortfolioCard> portfolioCards = portfolioService.getMyLikedPortfolios(request);
@@ -135,6 +170,11 @@ public class PortfolioController {
                     - JWT 인증( 로그인 )
                     - portfolioId 생략 불가
                     """)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "401", description = "JWT 인증 실패"),
+            @ApiResponse(responseCode = "404", description = "포트폴리오 없음")
+    })
     @GetMapping("/{portfolioId}")
     public ResponseEntity<CommonResponse<PortfolioDetailResponse>> getPortfolio(@PathVariable long portfolioId) {
         PortfolioDetailResponse portfolioDetail = portfolioService.getPortfolio(portfolioId);
