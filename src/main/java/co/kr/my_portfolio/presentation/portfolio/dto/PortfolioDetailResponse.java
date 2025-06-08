@@ -7,7 +7,10 @@ import lombok.Getter;
 
 import java.util.List;
 
-@Schema(description = "포트폴리오 상세 응답 DTO")
+@Schema(name = "PortfolioDetailResponse - 포트폴리오 상세 응답 DTO", description = """
+        특정 포트폴리오의 내용 전반과 작성자 닉네임,
+        속한 테그들을 반환합니다.
+        """)
 @Getter
 public class PortfolioDetailResponse {
     @Schema(description = "포트폴리오 ID", example = "1")
@@ -16,7 +19,7 @@ public class PortfolioDetailResponse {
     @Schema(description = "제목", example = "포트폴리오 제작 웹사이트")
     private final String title;
 
-    @Schema(description = "제목", example = "포트폴리오 게제 사이트를 기획하게 되었습니다.")
+    @Schema(description = "내용", example = "포트폴리오 게제 사이트를 기획하게 되었습니다.")
     private final String content;
 
     @Schema(description = "썸네일 URL", example = "https://example.com/image.jpg")
