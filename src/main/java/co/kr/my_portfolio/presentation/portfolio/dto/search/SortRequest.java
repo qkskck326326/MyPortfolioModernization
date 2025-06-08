@@ -5,7 +5,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Sort;
 
-@Schema(description = "포트폴리오 검색 기준")
+@Schema(name = "SortRequest - 포트폴리오 검색 기준",
+        description = """
+                포트폴리오 검색 기준입니다.
+                """)
 @Getter
 @NoArgsConstructor
 public class SortRequest {
