@@ -52,6 +52,9 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'com.tngtech.archunit:archunit:1.1.0'
 	testImplementation 'com.tngtech.archunit:archunit-junit5:1.1.0'
+
+	// Swagger
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
 }
 
 def generated = "$buildDir/generated/querydsl"
