@@ -108,7 +108,7 @@ public class PortfolioController {
             @ApiResponse(responseCode = "400", description = "요청 값 오류"),
             @ApiResponse(responseCode = "401", description = "JWT 인증 실패")
     })
-    @PostMapping("/search")
+    @PostMapping("/search/public")
     public ResponseEntity<CommonResponse<Page<PortfolioCard>>> getPortfolioCards(@RequestBody PortfolioSearchRequest request) {
         Page<PortfolioCard> portfolioCards = portfolioService.getPortfolioCards(request);
         return ResponseEntity.ok(CommonResponse.success(portfolioCards, "불러오기 성공"));
@@ -175,7 +175,7 @@ public class PortfolioController {
             @ApiResponse(responseCode = "401", description = "JWT 인증 실패"),
             @ApiResponse(responseCode = "404", description = "포트폴리오 없음")
     })
-    @GetMapping("/{portfolioId}")
+    @GetMapping("/{portfolioId}/public")
     public ResponseEntity<CommonResponse<PortfolioDetailResponse>> getPortfolio(@PathVariable long portfolioId) {
         PortfolioDetailResponse portfolioDetail = portfolioService.getPortfolio(portfolioId);
         return ResponseEntity.ok(CommonResponse.success(portfolioDetail, "포트폴리오를 성공적으로 불러왔습니다."));
