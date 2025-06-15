@@ -1,5 +1,7 @@
 package co.kr.my_portfolio.presentation.auth.controller;
 
+import co.kr.my_portfolio.global.exception.custom.UnauthorizedException;
+import co.kr.my_portfolio.infrastructure.security.AuthenticatedUser;
 import co.kr.my_portfolio.presentation.auth.dto.jwt.TokenResponse;
 import co.kr.my_portfolio.application.auth.LoginService;
 import co.kr.my_portfolio.global.response.CommonResponse;
@@ -9,14 +11,20 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.time.Duration;
 
 @Tag(name = "Auth", description = "인증/인가 관련 API")
 @RestController
@@ -38,11 +46,22 @@ public class AuthController {
             @ApiResponse(responseCode = "401", description = "인증 실패 (이메일 또는 비밀번호 불일치)")
     })
     @PostMapping("/login/email")
-    public ResponseEntity<CommonResponse<TokenResponse>> loginWithEmail(
+    public ResponseEntity<CommonResponse<String>> loginWithEmail(
             @Valid @RequestBody EmailLoginRequest request) {
 
         TokenResponse tokens = loginService.login(request.toCommand());
-        return ResponseEntity.ok(CommonResponse.success(tokens));
+
+        ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", tokens.getRefreshToken())
+                .httpOnly(true)
+                .secure(true) // HTTPS 환경이면 true
+                .path("/")
+                .sameSite("Strict") // or Lax, None (상황에 따라)
+                .maxAge(Duration.ofDays(7))
+                .build();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
+                .body(CommonResponse.success(tokens.getAccessToken()));
     }
 
     // 로그아웃
@@ -57,10 +76,22 @@ public class AuthController {
             @ApiResponse(responseCode = "401", description = "유효하지 않은 또는 만료된 토큰")
     })
     @PostMapping("/logout")
-    public ResponseEntity<CommonResponse<Void>> logout(HttpServletRequest request) {
-        String refreshToken = extractTokenFromHeader(request);
+    public ResponseEntity<CommonResponse<Void>> logout(HttpServletRequest request,
+                                                       @AuthenticationPrincipal AuthenticatedUser user) {
+        String refreshToken = extractRefreshTokenFromCookie(request);
         loginService.logout(refreshToken);
-        return ResponseEntity.ok(CommonResponse.success(null, "로그아웃 되었습니다."));
+
+        ResponseCookie deleteCookie = ResponseCookie.from("refreshToken", "")
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(0)
+                .build();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, deleteCookie.toString())
+                .body(CommonResponse.success(null, "로그아웃 되었습니다."));
+
     }
 
     // 토큰 재생성
@@ -77,7 +108,11 @@ public class AuthController {
     })
     @PostMapping("/reissue")
     public ResponseEntity<CommonResponse<TokenResponse>> reissue(HttpServletRequest request) {
-        String refreshToken = extractTokenFromHeader(request);
+        String refreshToken = extractRefreshTokenFromCookie(request);
+        if (refreshToken == null) {
+            throw new UnauthorizedException("RefreshToken 쿠키가 없습니다.");
+        }
+
         TokenResponse tokenResponse = loginService.reissue(refreshToken);
         return ResponseEntity.ok(CommonResponse.success(tokenResponse));
     }
@@ -89,6 +124,17 @@ public class AuthController {
             return bearer.substring(7);
         }
         throw new IllegalArgumentException("Authorization 헤더가 없거나 형식이 잘못되었습니다.");
+    }
+    
+    // 쿠키에서 Refresh Token 꺼내는 메소드
+    private String extractRefreshTokenFromCookie(HttpServletRequest request) {
+        if (request.getCookies() == null) return null;
+        for (Cookie cookie : request.getCookies()) {
+            if ("refreshToken".equals(cookie.getName())) {
+                return cookie.getValue();
+            }
+        }
+        return null;
     }
 
 

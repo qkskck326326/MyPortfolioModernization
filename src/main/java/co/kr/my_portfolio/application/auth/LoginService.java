@@ -30,7 +30,6 @@ public class LoginService {
     // 로그아웃
     public void logout(String refreshToken) {
         tokenService.invalidateRefreshToken(refreshToken);
-
     }
     
     // 토큰 재생성
