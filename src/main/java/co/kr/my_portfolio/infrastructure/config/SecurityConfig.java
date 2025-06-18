@@ -53,8 +53,7 @@ public class SecurityConfig {
                 .exceptionHandling(ex -> ex
                         .accessDeniedHandler(accessDeniedHandler)
                 )
-                .addFilterBefore(new JwtAuthenticationFilter(jwtProvider, objectMapper),
-                        UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
