@@ -29,6 +29,21 @@ public class LoginService {
     
     // 로그아웃
     public void logout(String refreshToken) {
+        // 인증 객체에서 인증 유저 정보 꺼내기
+        AuthenticatedUser authenticatedUser = authenticatedUserProvider.getAuthenticatedUser();
+        // 인증 유저의 id 꺼내기
+        Long authUserId = authenticatedUser.getId();
+        
+        // null 체크 후
+        if (authUserId == null) {
+            throw new UnauthorizedException("인증 정보가 유효하지 않습니다. 다시 로그인해주세요.");
+        }
+        
+        // 들어온 refreshToken 안의 UserId 와 일치하지 않는다면
+        if (authUserId != Long.parseLong(jwtProvider.getUserId(refreshToken))) {
+            throw new UnauthorizedException("사용자 정보가 일치하지 않습니다.");
+        }
+
         tokenService.invalidateRefreshToken(refreshToken);
     }
     
