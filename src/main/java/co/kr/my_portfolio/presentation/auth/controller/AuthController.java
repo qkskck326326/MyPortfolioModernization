@@ -1,7 +1,6 @@
 package co.kr.my_portfolio.presentation.auth.controller;
 
 import co.kr.my_portfolio.global.exception.custom.UnauthorizedException;
-import co.kr.my_portfolio.infrastructure.security.AuthenticatedUser;
 import co.kr.my_portfolio.presentation.auth.dto.jwt.TokenResponse;
 import co.kr.my_portfolio.application.auth.LoginService;
 import co.kr.my_portfolio.global.response.CommonResponse;
@@ -18,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,7 +26,7 @@ import java.time.Duration;
 
 @Tag(name = "Auth", description = "인증/인가 관련 API")
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
@@ -112,7 +110,6 @@ public class AuthController {
         if (refreshToken == null) {
             throw new UnauthorizedException("RefreshToken 쿠키가 없습니다.");
         }
-
         TokenResponse tokenResponse = loginService.reissue(refreshToken);
         return ResponseEntity.ok(CommonResponse.success(tokenResponse));
     }
