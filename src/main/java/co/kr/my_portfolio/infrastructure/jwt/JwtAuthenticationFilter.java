@@ -6,7 +6,8 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,11 +19,16 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
-@RequiredArgsConstructor
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
+public class JwtAuthenticationFilter extends OncePerRequestFilter{
 
     private final JwtProvider jwtProvider;
     private final ObjectMapper objectMapper;
+    private static final Logger logger = LogManager.getLogger(JwtAuthenticationFilter.class);
+
+    public JwtAuthenticationFilter(JwtProvider jwtProvider, ObjectMapper objectMapper) {
+        this.jwtProvider = jwtProvider;
+        this.objectMapper = objectMapper;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -31,19 +37,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String token = resolveToken(request);
-        
-        // 헤더에 토큰 없는 요청 통과
-        if (token == null) {
+
+        String path = request.getRequestURI();
+
+        // 헤더에 토큰 없는 요청은 통과
+        if (token == null || path.equals("/api/reissue")) {
             filterChain.doFilter(request, response);
             return;
         }
         
         // 유효하지 않은 토큰으로 보내는 요청 반려
-        if (!jwtProvider.validateToken(token)) {
-            sendUnauthorizedResponse(response, "토큰이 유효하지 않습니다.");
+        if (!StringUtils.hasText(token) || !jwtProvider.validateToken(token)) {
+            logger.debug("토큰 없음 or 유효하지 않음 → 인증 없이 통과");
+            filterChain.doFilter(request, response);
             return;
         }
-        
+
         // 유효한 토큰일시 인증객체 생성
         String userId = jwtProvider.getUserId(token);
         String role = jwtProvider.getRole(token).toAuthority();
@@ -63,7 +72,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // 요청 흐름에서 사용하기 위해 SecurityContextHolder 에 저장
         SecurityContextHolder.getContext().setAuthentication(authentication);
-
 
         filterChain.doFilter(request, response);
     }
