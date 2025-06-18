@@ -22,12 +22,22 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
-@RequiredArgsConstructor
 public class SecurityConfig {
 
     private final JwtProvider jwtProvider;
     private final ObjectMapper objectMapper;
     private final CustomAccessDeniedHandler accessDeniedHandler;
+
+    public SecurityConfig(JwtProvider jwtProvider, ObjectMapper objectMapper, CustomAccessDeniedHandler accessDeniedHandler) {
+        this.jwtProvider = jwtProvider;
+        this.objectMapper = objectMapper;
+        this.accessDeniedHandler = accessDeniedHandler;
+    }
+
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter() {
+        return new JwtAuthenticationFilter(jwtProvider, objectMapper);
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
