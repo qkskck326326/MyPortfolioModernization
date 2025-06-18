@@ -22,6 +22,11 @@ public class JwtAuthenticationToken extends UsernamePasswordAuthenticationToken 
     }
 
     @Override
+    public boolean isAuthenticated() {
+        return true;
+    }
+
+    @Override
     public Object getPrincipal() {
         return userId;
     }
