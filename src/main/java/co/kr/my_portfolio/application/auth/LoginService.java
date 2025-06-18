@@ -3,6 +3,10 @@ package co.kr.my_portfolio.application.auth;
 import co.kr.my_portfolio.application.auth.dto.LoginCommand;
 import co.kr.my_portfolio.application.auth.strategy.LoginStrategy;
 import co.kr.my_portfolio.domain.user.User;
+import co.kr.my_portfolio.global.exception.custom.UnauthorizedException;
+import co.kr.my_portfolio.infrastructure.jwt.JwtProvider;
+import co.kr.my_portfolio.infrastructure.security.AuthenticatedUser;
+import co.kr.my_portfolio.infrastructure.security.AuthenticatedUserProvider;
 import co.kr.my_portfolio.presentation.auth.dto.jwt.TokenResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,7 +19,9 @@ public class LoginService {
 
     private final List<LoginStrategy> loginStrategies;
     private final TokenService tokenService;
-    
+    private final AuthenticatedUserProvider authenticatedUserProvider;
+    private final JwtProvider jwtProvider;
+
     // 로그인
     public TokenResponse login(LoginCommand request) {
         LoginStrategy strategy = loginStrategies.stream()
