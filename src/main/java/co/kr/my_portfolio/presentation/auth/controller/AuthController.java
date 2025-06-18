@@ -77,8 +77,7 @@ public class AuthController {
             @ApiResponse(responseCode = "401", description = "유효하지 않은 또는 만료된 토큰")
     })
     @PostMapping("/logout")
-    public ResponseEntity<CommonResponse<Void>> logout(HttpServletRequest request,
-                                                       @AuthenticationPrincipal AuthenticatedUser user) {
+    public ResponseEntity<CommonResponse<Void>> logout(HttpServletRequest request) {
         String refreshToken = extractRefreshTokenFromCookie(request);
         loginService.logout(refreshToken);
 
