@@ -1,5 +1,6 @@
 package co.kr.my_portfolio.global.exception;
 
+import co.kr.my_portfolio.global.exception.custom.UnauthorizedException;
 import co.kr.my_portfolio.global.exception.custom.UserNotFoundException;
 import co.kr.my_portfolio.global.response.CommonResponse;
 import org.springframework.http.HttpStatus;
@@ -22,6 +23,14 @@ public class GlobalExceptionHandler {
                 .orElse("잘못된 요청입니다.");
 
         return ResponseEntity.badRequest().body(CommonResponse.fail(errorMessage));
+    }
+
+    // 비인증 에러
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<CommonResponse<?>> handleUserNotFound(UnauthorizedException ex) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(CommonResponse.fail(ex.getMessage()));
     }
     
     // 조회되지 않는 사용자 에러처리
