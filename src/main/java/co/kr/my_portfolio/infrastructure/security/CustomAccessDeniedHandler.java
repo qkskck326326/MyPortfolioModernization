@@ -23,7 +23,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
             {
                 "status": 403,
                 "error": "Forbidden",
-                "message": "권한이 없습니다. 관리자 권한이 필요합니다.",
+                "message": "권한이 없습니다.",
                 "path": "%s"
             }
             """.formatted(request.getRequestURI());
