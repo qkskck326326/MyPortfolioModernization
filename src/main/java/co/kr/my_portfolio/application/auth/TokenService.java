@@ -51,8 +51,8 @@ public class TokenService {
         RefreshToken savedToken = refreshTokenRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("이미 로그아웃된 사용자입니다."));
 
-        if (!savedToken.isSameToken(refreshToken)) {
-            throw new IllegalArgumentException("토큰 불일치. 탈취 가능성 있음.");
+        if (Long.parseLong(userId) != savedToken.getUserId()) {
+            throw new IllegalArgumentException("유저 불일치. 탈취 가능성 있음.");
         }
 
         refreshTokenRepository.deleteById(userId);
