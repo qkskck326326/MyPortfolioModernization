@@ -55,6 +55,7 @@ public class JwtProvider {
                     .parseClaimsJws(token);
             return true;
         } catch (JwtException | IllegalArgumentException e) {
+            System.out.println("e.getMessage() = " + e.getMessage());
             return false;
         }
     }
