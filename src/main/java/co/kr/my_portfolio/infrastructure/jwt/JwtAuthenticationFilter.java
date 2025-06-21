@@ -41,14 +41,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
         String path = request.getRequestURI();
 
         // 헤더에 토큰 없는 요청은 통과
-        if (token == null || path.equals("/api/reissue")) {
+        if (token == null || path.equals("/api/auth/reissue")) {
             filterChain.doFilter(request, response);
             return;
         }
         
         // 유효하지 않은 토큰으로 보내는 요청 반려
         if (!StringUtils.hasText(token) || !jwtProvider.validateToken(token)) {
-            logger.debug("토큰 없음 or 유효하지 않음 → 인증 없이 통과");
             filterChain.doFilter(request, response);
             return;
         }
