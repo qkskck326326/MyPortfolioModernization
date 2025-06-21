@@ -81,7 +81,7 @@ public class AuthController {
         ResponseCookie deleteCookie = ResponseCookie.from("refreshToken", "")
                 .httpOnly(true)
                 .secure(true)
-                .path("/")
+                .path("/api/auth")
                 .maxAge(0)
                 .build();
 
@@ -104,13 +104,30 @@ public class AuthController {
             @ApiResponse(responseCode = "403", description = "만료된 토큰이거나 접근 권한 없음")
     })
     @PostMapping("/reissue")
-    public ResponseEntity<CommonResponse<TokenResponse>> reissue(HttpServletRequest request) {
+    public ResponseEntity<CommonResponse<String>> reissue(HttpServletRequest request) {
         String refreshToken = extractRefreshTokenFromCookie(request);
         if (refreshToken == null) {
             throw new UnauthorizedException("RefreshToken 쿠키가 없습니다.");
         }
         TokenResponse tokenResponse = loginService.reissue(refreshToken);
-        return ResponseEntity.ok(CommonResponse.success(tokenResponse));
+        
+        // refreshToken이 새로 발급되었다면 쿠키에 추가 저장
+        if (tokenResponse.getRefreshToken() != null) {
+            ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", tokenResponse.getRefreshToken())
+                    .httpOnly(true)
+                    .secure(true) // HTTPS 환경이면 true
+                    .path("/")
+                    .sameSite("Lax") // or Lax, None (상황에 따라)
+                    .maxAge(Duration.ofDays(7))
+                    .build();
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
+                    .body(CommonResponse.success(tokenResponse.getAccessToken()));
+        }
+
+        
+        return ResponseEntity.ok(CommonResponse.success(tokenResponse.getAccessToken()));
     }
 
     // Header에서 Bearer 토큰 꺼내는 공통 메서드
