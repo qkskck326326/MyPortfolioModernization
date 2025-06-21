@@ -52,8 +52,7 @@ public class AuthController {
         ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", tokens.getRefreshToken())
                 .httpOnly(true)
                 .secure(true) // HTTPS 환경이면 true
-                .path("/api/auth/reissue")
-                .path("/api/auth/logout")
+                .path("/api/auth/**")
                 .sameSite("Lax") // or Lax, None (상황에 따라)
                 .maxAge(Duration.ofDays(7))
                 .build();
