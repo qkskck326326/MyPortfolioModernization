@@ -24,7 +24,7 @@ public class TokenService {
     private final JwtProperties jwtProperties;
     private final RefreshTokenRepository refreshTokenRepository;
     
-    // 토큰 셋 반환
+    // 토큰 셋 반환(로그인)
     public TokenResponse generateTokens(User user) {
         String userId = String.valueOf(user.getId());
         Role role = user.getRole();
@@ -61,16 +61,9 @@ public class TokenService {
     // 토큰 재생성
     @Transactional
     public TokenResponse reissueTokens(String refreshToken) {
-        // 인증 객체에서 정보 꺼내기
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (!(authentication instanceof JwtAuthenticationToken)) {
-            throw new IllegalStateException("인증 정보가 없습니다.");
-        }
-
-        JwtAuthenticationToken auth = (JwtAuthenticationToken) authentication;
-        String userId = auth.getUserId();
-        Role role = Role.valueOf(auth.getRole()); // 필요 시 enum 변환
+        // 유저 정보 꺼내기
+        String userId = jwtProvider.getUserId(refreshToken);
+        Role role = jwtProvider.getRole(refreshToken);
 
         // DB에 저장된 리프레시 토큰 비교
         RefreshToken savedToken = refreshTokenRepository.findById(userId)
