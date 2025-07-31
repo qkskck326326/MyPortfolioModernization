@@ -110,17 +110,20 @@ public class PortfolioController {
     })
     @PostMapping("/search/public")
     public ResponseEntity<CommonResponse<Page<PortfolioCard>>> getPortfolioCards(@RequestBody PortfolioSearchRequest request) {
+        System.out.println("request.toString() = " + request.toString());
         Page<PortfolioCard> portfolioCards = portfolioService.getPortfolioCards(request);
+        System.out.println("portfolioCards = " + portfolioCards.getContent());
         return ResponseEntity.ok(CommonResponse.success(portfolioCards, "불러오기 성공"));
     }
     
-    // 내가 쓴 포트폴리오 검색 & 불러오기
+    // 특정 유저가 쓴 포트폴리오 slug로 검색 & 불러오기
     @SecurityRequirement(name = "JWT")
-    @Operation(summary = "내가 쓴 포트폴리오 검색",
+    @Operation(summary = "특정 유저가 쓴 포트폴리오 검색",
             description = """
                     API 사용 조건
                     - JWT 인증( 로그인 )
                     - keyword, tags 생략 가능
+                    - slug 생략 불가능
                     - page 기본값 0, size 기본값 15
                     - sort-field 기본값 createdAt
                         - sort-field = createdAt or likeCount
@@ -132,9 +135,11 @@ public class PortfolioController {
             @ApiResponse(responseCode = "400", description = "요청 값 오류"),
             @ApiResponse(responseCode = "401", description = "JWT 인증 실패")
     })
-    @PostMapping("/search/my")
-    public ResponseEntity<CommonResponse<Page<PortfolioCard>>> getMyPortfolioCards(@RequestBody PortfolioSearchRequest request) {
-        Page<PortfolioCard> portfolioCards = portfolioService.getMyPortfolios(request);
+    @PostMapping("/search/{slug}/public")
+    public ResponseEntity<CommonResponse<Page<PortfolioCard>>> getMyPortfolioCards(
+            @PathVariable String slug,
+            @RequestBody PortfolioSearchRequest request) {
+        Page<PortfolioCard> portfolioCards = portfolioService.getMyPortfolios(slug, request);
         return ResponseEntity.ok(CommonResponse.success(portfolioCards, "불러오기 성공"));
     }
     
