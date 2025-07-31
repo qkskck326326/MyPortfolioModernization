@@ -3,6 +3,7 @@ package co.kr.my_portfolio.application.auth;
 import co.kr.my_portfolio.application.auth.dto.LoginCommand;
 import co.kr.my_portfolio.application.auth.strategy.LoginStrategy;
 import co.kr.my_portfolio.domain.user.User;
+import co.kr.my_portfolio.global.exception.custom.InvalidCredentialsException;
 import co.kr.my_portfolio.global.exception.custom.UnauthorizedException;
 import co.kr.my_portfolio.infrastructure.jwt.JwtProvider;
 import co.kr.my_portfolio.infrastructure.security.AuthenticatedUser;
@@ -27,7 +28,7 @@ public class LoginService {
         LoginStrategy strategy = loginStrategies.stream()
                 .filter(s -> s.supports(request))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("지원하지 않는 로그인 방식입니다."));
+                .orElseThrow(() -> new InvalidCredentialsException("지원하지 않는 로그인 방식입니다."));
 
         User user = strategy.authenticate(request);
         return tokenService.generateTokens(user);
