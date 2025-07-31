@@ -1,8 +1,10 @@
 package co.kr.my_portfolio.global.exception;
 
+import co.kr.my_portfolio.global.exception.custom.InvalidCredentialsException;
 import co.kr.my_portfolio.global.exception.custom.UnauthorizedException;
 import co.kr.my_portfolio.global.exception.custom.UserNotFoundException;
 import co.kr.my_portfolio.global.response.CommonResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -23,6 +26,13 @@ public class GlobalExceptionHandler {
                 .orElse("잘못된 요청입니다.");
 
         return ResponseEntity.badRequest().body(CommonResponse.fail(errorMessage));
+    }
+    
+    // 아이디 비밀번호 불일치 예외 처리
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<CommonResponse<String>> handleInvalidCredentials(InvalidCredentialsException ex) {
+        log.warn("[예외 발생 - 로그인 실패] {}", ex.getMessage());
+        return ResponseEntity.ok(CommonResponse.fail("아이디 또는 비밀번호가 일치하지 않습니다."));
     }
 
     // 비인증 에러
