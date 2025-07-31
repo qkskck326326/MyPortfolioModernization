@@ -30,6 +30,7 @@ public class Portfolio extends BaseTimeEntity {
     private String thumbnail;
 
     @Lob
+    @Column(columnDefinition = "MEDIUMTEXT")
     private String content;
 
     private Integer likeCount = 0;
