@@ -4,6 +4,7 @@ import co.kr.my_portfolio.application.auth.dto.EmailLoginCommand;
 import co.kr.my_portfolio.application.auth.dto.LoginCommand;
 import co.kr.my_portfolio.domain.user.User;
 import co.kr.my_portfolio.domain.user.UserRepository;
+import co.kr.my_portfolio.global.exception.custom.InvalidCredentialsException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -25,10 +26,10 @@ public class EmailLoginStrategy implements LoginStrategy {
         EmailLoginCommand emailRequest = (EmailLoginCommand) request;
 
         User user = userRepository.findByEmail(emailRequest.getEmail())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 이메일입니다."));
+                .orElseThrow(() -> new InvalidCredentialsException("존재하지 않는 이메일입니다."));
 
         if (!passwordEncoder.matches(emailRequest.getPassword(), user.getPassword())) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+            throw new InvalidCredentialsException("비밀번호가 일치하지 않습니다.");
         }
 
         return user;
