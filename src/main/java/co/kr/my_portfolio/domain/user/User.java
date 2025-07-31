@@ -20,8 +20,11 @@ public class User extends BaseTimeEntity {
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false, length = 30)
+    @Column(nullable = false, unique = true, length = 30)
     private String nickname;
+
+    @Column(nullable = false, unique = true, length = 30)
+    private String slug;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -43,12 +46,13 @@ public class User extends BaseTimeEntity {
     private LocalDate birth;
 
     @Builder
-    public User(String email, String password, String nickname, Role role,
+    public User(String email, String password, String nickname, String slug, Role role,
                 String userThumbnail, String introduce, String github, LocalDate birth) {
         validateNickname(nickname);
         this.email = email;
         this.password = password;
         this.nickname = nickname;
+        this.slug = slug;
         this.role = role;
         this.status = UserStatus.ACTIVE;
         this.userThumbnail = userThumbnail;
