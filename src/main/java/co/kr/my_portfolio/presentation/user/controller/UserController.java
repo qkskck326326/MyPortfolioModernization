@@ -2,10 +2,9 @@ package co.kr.my_portfolio.presentation.user.controller;
 
 import co.kr.my_portfolio.global.response.CommonResponse;
 import co.kr.my_portfolio.infrastructure.jwt.JwtAuthenticationToken;
-import co.kr.my_portfolio.presentation.user.dto.PasswordChangeRequest;
-import co.kr.my_portfolio.presentation.user.dto.UserProfileResponse;
-import co.kr.my_portfolio.presentation.user.dto.UserProfileUpdateRequest;
-import co.kr.my_portfolio.presentation.user.dto.UserSignupRequest;
+import co.kr.my_portfolio.presentation.portfolio.dto.EmailCheckRequest;
+import co.kr.my_portfolio.presentation.portfolio.dto.NicknameCheckRequest;
+import co.kr.my_portfolio.presentation.user.dto.*;
 import co.kr.my_portfolio.application.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -26,7 +25,7 @@ public class UserController {
 
     private final UserService userService;
 
-    @Operation(summary = "회원가입", description = """
+    @Operation(summary = "이메일 회원가입", description = """
             입력된 정보로 회원가입 합니다.
             API 사용 조건
            - email, password, nickname 생략 불가능
@@ -42,11 +41,43 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "회원가입 성공"),
             @ApiResponse(responseCode = "400", description = "요청 형식 오류 또는 중복된 이메일")
     })
-    @PostMapping("/signup")
+    @PostMapping("/signup/email/public")
     public ResponseEntity<CommonResponse<String>> signup(@Valid @RequestBody UserSignupRequest request) {
         userService.signup(request);
         return ResponseEntity.ok(CommonResponse.success(null, "회원가입 완료"));
     }
+
+    @PostMapping("/check-nickname/public")
+    public ResponseEntity<CommonResponse<Boolean>> checkNickname(
+            @Valid @RequestBody NicknameCheckRequest request
+    ) {
+        boolean exists = userService.existsByNickname(request.getNickname());
+        return ResponseEntity.ok(CommonResponse.success(exists));
+    }
+
+    @PostMapping("/check-email/public")
+    public ResponseEntity<CommonResponse<Boolean>> checkEmail(
+            @Valid @RequestBody EmailCheckRequest request
+    ) {
+        boolean exists = userService.existsByEmail(request.getEmail());
+        return ResponseEntity.ok(CommonResponse.success(exists));
+    }
+
+    // 프론트에서 user 정보 store 저장을 위한 api
+    @GetMapping("/my/info")
+    public ResponseEntity<CommonResponse<UserInfoResponse>> getMyInfo() {
+        UserInfoResponse response = userService.getMyInfoForState();
+        return ResponseEntity.ok(CommonResponse.success(response));
+    }
+
+    // 특정 유저 정보 조회 api
+    @GetMapping("/{slug}/info/public")
+    public ResponseEntity<CommonResponse<UserProfileAndTagsResponse>> getUserInfoBySlug(@PathVariable String slug) {
+        UserProfileAndTagsResponse response = userService.getUserInfoBySlug(slug);
+        return ResponseEntity.ok(CommonResponse.success(response));
+    }
+
+
 
     @SecurityRequirement(name = "JWT")
     @Operation(summary = "내 정보 조회", description = """
@@ -108,5 +139,6 @@ public class UserController {
         userService.changePassword(request);
         return ResponseEntity.ok(CommonResponse.success(null, "비밀번호가 성공적으로 변경되었습니다. \n 다시 로그인해주세요."));
     }
+
 }
 
