@@ -113,7 +113,7 @@ public class PortfolioService {
     }
 
     // 내가 쓴 글 목록
-    public Page<PortfolioCard> getMyPortfolios(PortfolioSearchRequest request) {
+    public Page<PortfolioCard> getMyPortfolios(String slug, PortfolioSearchRequest request) {
         Pageable pageable = PageRequest.of(
                 request.getPage(),
                 request.getSize(),
@@ -124,7 +124,7 @@ public class PortfolioService {
                         .collect(Collectors.toList()))
         );
 
-        return portfolioQueryRepositoryImpl.findMyPortfolios(request.getKeyword(), request.getTags(), pageable);
+        return portfolioQueryRepositoryImpl.findMyPortfolios(slug, request.getKeyword(), request.getTags(), pageable);
     }
 
     // 내가 좋아요 표시한 글 목록
