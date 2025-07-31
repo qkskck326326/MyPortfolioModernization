@@ -19,6 +19,9 @@ public class UserProfileResponse {
     @Schema(description = "닉네임", example = "이건우")
     private final String nickname;
 
+    @Schema(description = "닉네임", example = "이건우")
+    private final String slug;
+
     @Schema(description = "썸네일 링크", example = "https://example.com/image.jpg")
     private final String userThumbnail;
 
@@ -36,10 +39,11 @@ public class UserProfileResponse {
     private final LocalDate birth;
 
     @Builder
-    public UserProfileResponse(String nickname,
+    public UserProfileResponse(String nickname, String slug,
                                String userThumbnail, String email, String github,
                                String introduce, LocalDate birth) {
         this.nickname = nickname;
+        this.slug = slug;
         this.userThumbnail = userThumbnail;
         this.email = email;
         this.github = github;
@@ -50,6 +54,7 @@ public class UserProfileResponse {
     public static UserProfileResponse from(User user) {
         return UserProfileResponse.builder()
                 .nickname(user.getNickname())
+                .slug(user.getSlug())
                 .userThumbnail(user.getUserThumbnail())
                 .email(user.getEmail())
                 .github(user.getGithub())
