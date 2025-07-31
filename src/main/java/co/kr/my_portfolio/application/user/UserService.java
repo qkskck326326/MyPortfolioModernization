@@ -84,8 +84,8 @@ public class UserService {
         user.updateProfile(
                 request.getNickname(),
                 request.getUserThumbnail(),
-                request.getEmail(),
                 request.getIntroduce(),
+                request.getGithub(),
                 request.getBirth()
         );
 
