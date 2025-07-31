@@ -51,8 +51,8 @@ public class AuthController {
 
         ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", tokens.getRefreshToken())
                 .httpOnly(true)
-                .secure(true) // HTTPS 환경이면 true
-                .path("/api/auth/**")
+                .secure(false) // HTTPS 환경이면 true ////////
+                .path("/api/auth")
                 .sameSite("Lax") // or Lax, None (상황에 따라)
                 .maxAge(Duration.ofDays(7))
                 .build();
@@ -80,7 +80,7 @@ public class AuthController {
 
         ResponseCookie deleteCookie = ResponseCookie.from("refreshToken", "")
                 .httpOnly(true)
-                .secure(true)
+                .secure(false) // HTTPS 환경이면 true /////////
                 .path("/api/auth")
                 .maxAge(0)
                 .build();
@@ -115,8 +115,8 @@ public class AuthController {
         if (tokenResponse.getRefreshToken() != null) {
             ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", tokenResponse.getRefreshToken())
                     .httpOnly(true)
-                    .secure(true) // HTTPS 환경이면 true
-                    .path("/")
+                    .secure(false) // HTTPS 환경이면 true /////////
+                    .path("/api/auth")
                     .sameSite("Lax") // or Lax, None (상황에 따라)
                     .maxAge(Duration.ofDays(7))
                     .build();
