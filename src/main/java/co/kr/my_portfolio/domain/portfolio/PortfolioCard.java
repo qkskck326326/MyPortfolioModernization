@@ -12,16 +12,18 @@ public class PortfolioCard {
     private final String thumbnail;
     private final String title;
     private final int likeCount;
+    private final String slug;
     private final String nickname;
     private final LocalDateTime createdAt;
 
     @Builder
     @QueryProjection
-    public PortfolioCard(Long id, String thumbnail, String title, int likeCount, String nickname, LocalDateTime createdAt) {
+    public PortfolioCard(Long id, String thumbnail, String title, int likeCount, String slug, String nickname, LocalDateTime createdAt) {
         this.id = id;
         this.thumbnail = thumbnail;
         this.title = title;
         this.likeCount = likeCount;
+        this.slug = slug;
         this.nickname = nickname;
         this.createdAt = createdAt;
     }
