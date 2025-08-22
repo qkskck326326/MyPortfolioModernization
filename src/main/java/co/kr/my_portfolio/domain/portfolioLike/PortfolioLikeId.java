@@ -1,13 +1,20 @@
 package co.kr.my_portfolio.domain.portfolioLike;
 
 import jakarta.persistence.Embeddable;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 @Embeddable
-public class PortfolioLikeId {
-    Long userId;
-    Long portfolioId;
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+public class PortfolioLikeId implements Serializable {
+    private Long userId;
+    private Long portfolioId;
 
     @Override
     public boolean equals(Object o) {
