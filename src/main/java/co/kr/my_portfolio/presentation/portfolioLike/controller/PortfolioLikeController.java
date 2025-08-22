@@ -2,6 +2,7 @@ package co.kr.my_portfolio.presentation.portfolioLike.controller;
 
 import co.kr.my_portfolio.application.portfolioLike.PortfolioLikeService;
 import co.kr.my_portfolio.global.response.CommonResponse;
+import co.kr.my_portfolio.presentation.portfolioLike.dto.PortfolioLikeResponse;
 import co.kr.my_portfolio.presentation.portfolioLike.dto.PortfolioLikeToggleRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -35,10 +36,38 @@ public class PortfolioLikeController {
             @ApiResponse(responseCode = "404", description = "해당 포트폴리오가 존재하지 않음")
     })
     @PostMapping
-    public ResponseEntity<CommonResponse<String>> portfolioLikeToggle(
+    public ResponseEntity<CommonResponse<PortfolioLikeResponse>> portfolioLikeToggle(
             @RequestBody PortfolioLikeToggleRequest request
     ){
-        portfolioLikeService.portfolioLikeToggle(request.getPortfolioId());
-        return null;
+        PortfolioLikeResponse response = portfolioLikeService.portfolioLikeToggle(request.getPortfolioId());
+        System.out.println("response = " + response); // 로그로 확인
+        return ResponseEntity.ok(CommonResponse.success(response));
     }
+
+    // 특정 유저의 특정 포트폴리오 좋아요 표시 확인
+    @SecurityRequirement(name="JWT")
+    @Operation(summary = "포트폴리오 좋아요 토글",
+            description = """
+                    로그인중인 유저가 포트폴리오 상세 페이지에 접속하였을 때에, 
+                    해당 포트폴리오를 좋아요 표시 한 적이 있는지를 판별하는 API 입니다.
+                    API 사용 조건
+                    - JWT 인증(로그인)
+                    - portfiolioId 생략 불가, 0 이상의 숫자
+                    """)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "좋아요 토글 성공"),
+            @ApiResponse(responseCode = "400", description = "portfolioId 누락 또는 유효하지 않음"),
+            @ApiResponse(responseCode = "401", description = "JWT 인증 실패"),
+            @ApiResponse(responseCode = "404", description = "해당 포트폴리오가 존재하지 않음")
+    })
+    @GetMapping("/{portfolioId}")
+    public ResponseEntity<CommonResponse<Boolean>> portfolioLikeCheck(
+            @PathVariable Long portfolioId
+    ){
+        boolean isLiked = portfolioLikeService.portfolioLikeCheck(portfolioId);
+
+        return ResponseEntity.ok(CommonResponse.success(isLiked));
+    }
+
+
 }
