@@ -34,4 +34,11 @@ public class PortfolioLike extends BaseTimeEntity {
         this.portfolio = portfolio;
         this.user = user;
     }
+
+    @PrePersist
+    public void prePersist() {
+        if (this.id == null) {
+            this.id = new PortfolioLikeId(user.getId(), portfolio.getId());
+        }
+    }
 }
