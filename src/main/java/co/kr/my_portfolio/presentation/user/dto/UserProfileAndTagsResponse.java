@@ -31,9 +31,6 @@ public class UserProfileAndTagsResponse {
     @Schema(description = "자기소개", example = "안녕하세요. 백엔드 개발자입니다.")
     private String introduce;
 
-    @Schema(description = "생년월일", example = "2000-01-01")
-    private LocalDate birth;
-
     @Schema(description = "사용한 태그 목록")
     private List<TagCountDto> tags;
 
@@ -45,7 +42,6 @@ public class UserProfileAndTagsResponse {
                 .email(user.getEmail())
                 .github(user.getGithub())
                 .introduce(user.getIntroduce())
-                .birth(user.getBirth())
                 .tags(tags)
                 .build();
     }
