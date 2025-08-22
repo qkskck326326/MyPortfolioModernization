@@ -26,3 +26,7 @@ logging:
   level:
     org.springframework.security: debug
     org.springframework.security.web.FilterChainProxy: debug
+
+imgbb:
+  api:
+    key: "a714e7f73bc8a242a9218c35c7b75e9e"
