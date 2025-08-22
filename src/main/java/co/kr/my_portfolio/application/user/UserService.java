@@ -141,7 +141,6 @@ public class UserService {
         List<TagCountDto> tags = portfolioTagMappingQueryRepository.countTagsByUserId(user.getId());
         return UserProfileAndTagsResponse.builder()
                 .userThumbnail(user.getUserThumbnail())
-                .birth(user.getBirth())
                 .github(user.getGithub())
                 .introduce(user.getIntroduce())
                 .slug(user.getSlug())
