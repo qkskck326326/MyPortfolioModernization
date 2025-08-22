@@ -19,7 +19,7 @@ public class UserProfileResponse {
     @Schema(description = "닉네임", example = "이건우")
     private final String nickname;
 
-    @Schema(description = "닉네임", example = "이건우")
+    @Schema(description = "슬러그", example = "이건우")
     private final String slug;
 
     @Schema(description = "썸네일 링크", example = "https://example.com/image.jpg")
