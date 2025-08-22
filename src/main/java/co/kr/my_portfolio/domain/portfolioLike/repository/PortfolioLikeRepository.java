@@ -11,4 +11,6 @@ public interface PortfolioLikeRepository extends JpaRepository<PortfolioLike, Lo
     Optional<PortfolioLike> findByUserAndPortfolio(User user, Portfolio portfolio);
     boolean existsByUserAndPortfolio(User user, Portfolio portfolio);
     void deleteByUserAndPortfolio(User user, Portfolio portfolio);
+
+    boolean existsByPortfolioAndUser(Portfolio portfolio, User user);
 }
